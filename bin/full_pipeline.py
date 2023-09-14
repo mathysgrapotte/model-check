@@ -65,7 +65,10 @@ if __name__ == '__main__':
     # run a tune run
     dfs = mnn_trainer.tune(search_space=config)
     best_result = dfs.get_best_result(metric='accuracy', mode='max')
-    print(dfs)
+    checkpoint = best_result.checkpoint.to_dict()
+    # printing accuracy of the best model
+    print("printing accuracy of the best model")
+    print(best_result.metrics)
     print("printing model")
     print(mnn_trainer.model)
     print("model has been printed")

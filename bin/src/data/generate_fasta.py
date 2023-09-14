@@ -8,13 +8,12 @@ class Fasta(ABC):
     """
 
     # init function for the fasta class, takes as input the path to the fasta file
-    def __init__(self, path_to_fasta):
-        self.path_to_fasta = path_to_fasta
+    def __init__(self):
         self.sequences = []
         self.sequence_names = []
         self.tags = []
 
-    def write_fasta(self):
+    def write_fasta(self, path_to_write):
         """
         This function is a helper function for writing a fasta file taking as input self. 
         Fasta should be the following format : 
@@ -30,12 +29,12 @@ class Fasta(ABC):
         # check if there is at least one sequence
         assert len(self.sequences) > 0, "There should be at least one sequence"
 
-        with open(self.path_to_fasta, 'w') as fasta_file:
+        with open(path_to_write, 'w') as fasta_file:
             for sequence, sequence_name, tag in zip(self.sequences, self.sequence_names, self.tags):
                 fasta_file.write(f">{sequence_name}|{tag}\n")
                 fasta_file.write(sequence + '\n')
 
-    def load_fasta(self):
+    def load_fasta(self, path_to_read):
         """
         This function is a helper function for loading a fasta file taking as input self. 
         Fasta should be the following format : 
@@ -45,7 +44,7 @@ class Fasta(ABC):
 
         Self has to contain sequences, tags and names. 
         """
-        with open(self.path_to_fasta, 'r') as fasta_file:
+        with open(path_to_read, 'r') as fasta_file:
             for line in fasta_file:
                 if line[0] == '>':
                     # this is a sequence name
@@ -62,8 +61,8 @@ class GenerateFasta(Fasta):
     This class heritates from the fasta class and is used as a master class to generate dummy fasta files.
     """
     
-    def __init__(self, path_to_fasta, dna_sequence_length):
-        super().__init__(path_to_fasta)
+    def __init__(self, dna_sequence_length):
+        super().__init__()
         self.dna_sequence_length = dna_sequence_length
 
     def generate_random_dna_sequence(self):
@@ -110,8 +109,8 @@ class GenerateFasta(Fasta):
 class GenerateSingleFixedMotifDataset(GenerateFasta):
     """ This class generates a simple balanced dataset with a single fixed motif being present in some sequences. Said sequences are associated a positive label where the non motif sequences are associated a negative label. """
     
-    def __init__(self, path_to_fasta, dna_sequence_length, motif, motif_tag, non_motif_tag, number_of_sequences=1000, motif_start=None):
-        super().__init__(path_to_fasta, dna_sequence_length)
+    def __init__(self, dna_sequence_length, motif, motif_tag, non_motif_tag, number_of_sequences=1000, motif_start=None):
+        super().__init__(dna_sequence_length)
         self.motif = motif
         self.motif_start = motif_start
         self.motif_tag = motif_tag

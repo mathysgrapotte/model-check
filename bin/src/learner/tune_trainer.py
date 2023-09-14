@@ -3,6 +3,7 @@
 import numpy as np
 from ray import tune
 from ray.air import session
+from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 from scipy.stats import spearmanr
 import numpy as np
@@ -146,7 +147,8 @@ class MnnTrainer(Trainer):
             test_loss, accuracy = self.test_regression(self.model)
 
             # report test loss and accuracy to session
-            session.report({"accuracy": accuracy, "loss": test_loss})
+            checkpoint = Checkpoint.from_dict({"epoch":epoch, "model_state_dict": self.model.state_dict()})
+            session.report({"accuracy": accuracy, "loss": test_loss}, checkpoint=checkpoint)
 
     def tune(self, search_space, num_samples=3):
         """
@@ -163,18 +165,27 @@ class MnnTrainer(Trainer):
         assert 'learning_rate' in search_space.keys()
         assert 'batch_size' in search_space.keys()        
 
-        tuner = tune.Tuner(
-            self.train_mnn,
-            tune_config=tune.TuneConfig(
-                num_samples=num_samples,
-                scheduler=ASHAScheduler(metric="accuracy", mode="max")
-            ),
-            param_space=search_space
+        for _ in range(2):
+            tuner = tune.Tuner(
+                self.train_mnn,
+                tune_config=tune.TuneConfig(
+                    num_samples=num_samples,
+                    scheduler=ASHAScheduler(metric="accuracy", mode="max")
+                ),
+                param_space=search_space
 
-        )
+            )
 
-        results = tuner.fit()
-        #dfs = {result.log_dir: result.metrics_dataframe for result in results}
+            results = tuner.fit()
+            best_result = results.get_best_result(metric='accuracy', mode='max')
+            checkpoint = best_result.checkpoint.to_dict()
+
+            if not hasattr(self, 'model'):
+                self.model = Net(best_result.config['filter_size'], size=self.size)
+                self.model.load_state_dict(checkpoint['model_state_dict'])
+            else:
+                self.model.add_block(best_result.config['filter_size'])
+                self.model.load_state_dict(checkpoint['model_state_dict'])
 
         return results
 

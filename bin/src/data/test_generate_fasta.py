@@ -12,22 +12,19 @@ class TestFasta(unittest.TestCase):
     """ test class for the Fasta class """
     def setUp(self):
         """ sets up the test cases """
-        self.fasta = Fasta("test.fasta")
+        self.fasta_writer = Fasta()
+        self.fasta_loader = Fasta()
 
-    def test_write_fasta(self):
-        """ tests the write_fasta method """
-        self.fasta.sequences = ["ACTG", "ACTG"]
-        self.fasta.sequence_names = ["seq1", "seq2"]
-        self.fasta.tags = [1, 2]
-        self.fasta.write_fasta()
-
-    def test_load_fasta(self):
-        """ tests the load_fasta method """
-        self.fasta.write_fasta()
-        self.fasta.load_fasta()
-        self.assertEqual(self.fasta.sequences, ["ACTG", "ACTG"])
-        self.assertEqual(self.fasta.sequence_names, ["seq1", "seq2"])
-        self.assertEqual(self.fasta.tags, [1, 2])
+    def test_write_load_fasta(self):
+        """ tests the load_fasta method and write_fasta method """
+        self.fasta_writer.sequences = ["ACTG", "ACTG"]
+        self.fasta_writer.sequence_names = ["seq1", "seq2"]
+        self.fasta_writer.tags = [1, 2]
+        self.fasta_writer.write_fasta("test.fasta")
+        self.fasta_loader.load_fasta("test.fasta")
+        self.assertEqual(self.fasta_loader.sequences, ["ACTG", "ACTG"])
+        self.assertEqual(self.fasta_loader.sequence_names, ["seq1", "seq2"])
+        self.assertEqual(self.fasta_loader.tags, [1, 2])
 
 class TestGenerateFasta(unittest.TestCase):
     """ test class for the GenerateFasta class """

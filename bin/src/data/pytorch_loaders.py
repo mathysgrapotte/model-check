@@ -19,9 +19,9 @@ class fastaDataset(Dataset, Fasta):
         """
         This function initializes the fastaDataset class. 
         """
-        Fasta.__init__(self, path_to_fasta)
+        Fasta.__init__(self)
         self.one_hot_encoder = OneHotEncoder(categories=[list(alphabet)])
-        self.load_fasta()
+        self.load_fasta(path_to_fasta)
         self.one_hot_encode_sequences_mp()
 
     def one_hot_encode_sequences_mp(self):
