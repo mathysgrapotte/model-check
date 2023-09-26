@@ -11,3 +11,4 @@
 work
 data
 .DS_Store
+/singularity_cache
