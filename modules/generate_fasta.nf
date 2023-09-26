@@ -1,7 +1,7 @@
 
 process GENERATE_FASTA {
 
-    container 'python:latest'
+    container 'numpy'
 
     output:
     stdout emit: standardout  
