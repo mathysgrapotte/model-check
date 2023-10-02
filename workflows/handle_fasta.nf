@@ -20,7 +20,9 @@ workflow HANDLE_FASTA {
     if (params.input_fasta) {
         fasta = params.input_fasta
     } else {
-        fasta = GENERATE_FASTA()
+        GENERATE_FASTA()
+	fasta = GENERATE_FASTA.out.dna_fasta
+	GENERATE_FASTA.out.standardout.view()
     }
 
 

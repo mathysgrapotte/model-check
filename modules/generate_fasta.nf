@@ -1,9 +1,10 @@
 
 process GENERATE_FASTA {
 
-    container 'numpy'
+    container 'clearlinux/numpy-mp:latest'
 
     output:
+    path "*", emit: dna_fasta
     stdout emit: standardout  
 
     script:
@@ -17,7 +18,7 @@ process GENERATE_FASTA {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "ENCODED"
     """
-    echo -o ${prefix} ${args}
+    launch_fasta_generate.py -o ${prefix} -sl 100 -m aattttttttttttaa -t 5 -u 0 -ns 5 --modules_version True
     """
 
 }
