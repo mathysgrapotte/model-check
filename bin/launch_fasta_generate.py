@@ -10,8 +10,8 @@ def get_args():
 	"get the arguments when using from the commandline"
 
 	parser = argparse.ArgumentParser(description="This script generates DNA sequence from a given starting motif.")
-	parser.add_argument("-o", "--out_name", type=str, required=True, metavar="FILE", help='The file path for the generated DNBA sequences in fasta format.' )
-	parser.add_argument("-sl", "--seq_len", type=int, required=False, nargs='?', const=100, default=100, metavar="LEN", help='Length in integer for the DNA seqs to be created. Default 100 (aa).' )
+	parser.add_argument("-o", "--out_name", type=str, required=True, metavar="FILE", help='The file path for the generated DNA sequences in fasta format.' )
+	parser.add_argument("-sl", "--seq_len", type=int, required=False, nargs='?', const=100, default=100, metavar="LEN", help='Length in integer for the DNA seqs to be created. Default 100.' )
 	parser.add_argument("-m", "--motif", type=str, required=False, nargs='?', const='aattttttttttttaa', default='aattttttttttttaa', metavar="SEQ", help='The motif sequence that is used to generate the DNA sequences for the positive set. default aattttttttttttaa .')
 	parser.add_argument("-t", "--motif_tag", type=int, required=False, nargs='?', const=5, default=5, metavar="LEN", help='TODO write description' )
 	parser.add_argument("-u", "--non_motif_tag", type=int, required=False, nargs='?', const=0, default=0, metavar="LEN", help='TODO write description' )

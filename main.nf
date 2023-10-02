@@ -14,7 +14,7 @@ nextflow.enable.dsl = 2
 */
 
 include { HANDLE_FASTA } from './workflows/handle_fasta.nf'
-//include {  } from './subworkflows/preparedata'
+include { CHECK_TRAINABLE } from './workflows/check_trainable.nf'
 
 
 /*
@@ -27,8 +27,13 @@ include { HANDLE_FASTA } from './workflows/handle_fasta.nf'
 workflow {
 
     fasta = HANDLE_FASTA()
-
+    // TODO make a nicer print of the filename
+    // TODO write all parameters flags to log file 
     fasta.view()
+
+    message = CHECK_TRAINABLE( fasta )
+    message.view()
+
 }
 
 /*
