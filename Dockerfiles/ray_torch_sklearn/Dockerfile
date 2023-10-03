@@ -6,6 +6,7 @@ LABEL maintainer="Alessio Vignoli" \
 
 RUN pip install \
 		ray==2.3.0 \
+		ray[rllib] \
         scipy==1.11.3 \ 
-		scikit-learn==1.3.1
-		
+		scikit-learn==1.3.1 \
+		pandas==2.1.1
