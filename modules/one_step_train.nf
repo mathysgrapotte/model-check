@@ -1,7 +1,7 @@
 
 process ONE_STEP_TRAIN {
 
-    container 'clearlinux/numpy-mp:latest'
+    container 'alessiovignoli3/model-check:ray_torch_sklearn'
     label 'process_low'
     tag "${fasta}"
 
