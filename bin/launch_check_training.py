@@ -6,8 +6,11 @@ from src.learner.tune_trainer import Trainer
 from src.model.mnn_models import Net
 from torch.utils.data import DataLoader
 import sys
-import numpy as np
-
+import ray
+import numpy 
+import torch
+from torch import nn
+import torch.optim as optim
 
 def get_args():
 
@@ -26,10 +29,52 @@ def get_args():
 	return args
 
 
-def main(data, batch_size, shuffle, seq_len, optimizer_lr, optimizer_momentum, modules_versionn='False'):
+def main(data, Batch_size, Shuffle, seq_len, optimizer_lr, optimizer_momentum, modules_version='False'):
+	
+	if eval(modules_version):
+                print('python :', sys.version, '\n',  'numpy :', numpy.__version__ , '\n', 'torch :', torch.__version__, '\n', 'ray :', ray.__version__)
 
-	print(data, batch_size, shuffle, seq_len, optimizer_lr, optimizer_momentum, modules_versionn)
+	# load the fasta file using the pytorch fasta loader
+	pytorch_loader = fastaDataset(data)
+	train_set = DataLoader(pytorch_loader, batch_size=Batch_size, shuffle=Shuffle)
+	
+	# check if we can access the first batch
+	for batch_idx, (data, target, sequence_names) in enumerate(train_set):
+		if data.shape == torch.Size([Batch_size, 4, seq_len]) and target.shape == torch.Size([Batch_size]) and len(sequence_names) == Batch_size:
+			print("Data is loaded correctly")
+			break
+		else:
+			print("Data batched does not have the expected size. given :", data.shape, 'expected :', [Batch_size, 4, seq_len])
+			raise TypeError("Data not loaded correctly")
 
+	
+	# define the loss function
+	loss_function = nn.MSELoss()
+	
+	# define the model
+	model = Net(filter_size=4, size=seq_len)
+
+	# define the optimizer
+	optimizer = optim.SGD(model.parameters(), lr=optimizer_lr, momentum=optimizer_momentum)
+
+	# initiate the tune trainer
+	tune_trainer = Trainer(train_set, train_set, loss_function)
+	
+
+	# make sure that the model is training (i.e. the weights are changing) after running a tune_trainer.train() call
+	# compare the weights before and after training
+	weights_before = str(list(model.parameters())[0])
+	tune_trainer.train(model=model, optimizer=optimizer)
+	weights_after = str(list(model.parameters())[0])
+	if weights_before == weights_after:
+		print('Weights have not updated, model is not training')
+		raise TypeError("Model not training")
+	else:
+		print('Model is traininable, weights are changing')
+	
+
+	# run a testing run from the tune_trainer
+	print(tune_trainer.test_regression(model=model))
 
 
 if __name__ == "__main__":

@@ -14,13 +14,14 @@ process ONE_STEP_TRAIN {
     script:
     def args = task.ext.args ?: ''
     """
-    echo 'bubba' 
+    launch_check_training.py -i ${fasta} ${args}
     """
 
     stub:
+    // first reduce the input sequernces to 10 in total so that is faster to run
     """
-    launch_check_training.py -i ${fasta} -bs 3 
-    echo 'bubba'
+    awk '/^>/{n++;if(n<=10){print}} n>10{exit} !/^>/'  ${fasta} > tmp
+    launch_check_training.py -i tmp -bs 3 --modules_version True 
     """
 
 }
