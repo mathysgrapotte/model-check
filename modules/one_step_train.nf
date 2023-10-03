@@ -19,7 +19,7 @@ process ONE_STEP_TRAIN {
 
     stub:
     """
-    launch_check_training.py ${fasta} -bs 3 
+    launch_check_training.py -i ${fasta} -bs 3 
     echo 'bubba'
     """
 
