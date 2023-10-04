@@ -1,8 +1,8 @@
 
-process ONE_STEP_TRAIN {
+process TRAIN_MODEL {
 
     container 'alessiovignoli3/model-check:ray_torch_sklearn'
-    label 'process_low'
+    label 'process_medium_high'
     tag "${fasta}"
 
     input:
@@ -14,14 +14,14 @@ process ONE_STEP_TRAIN {
     script:
     def args = task.ext.args ?: ''
     """
-    launch_check_training.py -i ${fasta} ${args}
+    launch_training.py -i ${fasta} ${args}
     """
 
     stub:
     // first reduce the input sequernces to 10 in total so that is faster to run
     """
     awk '/^>/{n++;if(n<=10){print}} n>10{exit} !/^>/'  ${fasta} > tmp
-    launch_check_training.py -i tmp -bs 1,10 --modules_version True 
+    launch_training.py -i tmp -bs 1,10 -e 1 --modules_version True
     """
 
 }
