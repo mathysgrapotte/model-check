@@ -45,9 +45,6 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
 	# define the loss function
 	loss_function = nn.MSELoss()
 
-	# define the model
-	model = Net(filter_size=4, size=seq_len)
-
 	# initiate the tune trainer
 	mnn_trainer = MnnTrainer(train_loader=train_set, test_loader=train_set, loss_function=loss_function, epochs=Epochs, size=seq_len)
 
