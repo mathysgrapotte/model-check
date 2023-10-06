@@ -150,7 +150,7 @@ class MnnTrainer(Trainer):
             checkpoint = Checkpoint.from_dict({"epoch":epoch, "model_state_dict": self.model.state_dict()})
             session.report({"accuracy": accuracy, "loss": test_loss}, checkpoint=checkpoint)
 
-    def tune(self, search_space, num_samples=3):
+    def tune(self, search_space, num_samples=3, patience=2, threshold=0.05):
         """
         tunes the hyperparameters of the model
 
@@ -165,7 +165,14 @@ class MnnTrainer(Trainer):
         assert 'learning_rate' in search_space.keys()
         assert 'batch_size' in search_space.keys()        
 
-        for _ in range(2):
+        # initialize accuracy value to zero
+        accuracy = 0
+
+        patience_counter = 0
+
+        while patience_counter < patience:
+            # print patience_counter and patience
+            print(f'patience_counter: {patience_counter}, patience: {patience}')
             tuner = tune.Tuner(
                 self.train_mnn,
                 tune_config=tune.TuneConfig(
@@ -180,12 +187,25 @@ class MnnTrainer(Trainer):
             best_result = results.get_best_result(metric='accuracy', mode='max')
             checkpoint = best_result.checkpoint.to_dict()
 
-            if not hasattr(self, 'model'):
-                self.model = Net(best_result.config['filter_size'], size=self.size)
-                self.model.load_state_dict(checkpoint['model_state_dict'])
+            # print the difference between previous accuracy and best result accuracy
+            print(f'accuracy difference: {best_result.metrics["accuracy"] - accuracy}')
+
+            # if the accuracy of the best result is greater than the current accuracy, set the current accuracy to the best result accuracy
+            if best_result.metrics['accuracy'] > accuracy + threshold:
+
+                # if the model has not been initialized, initialize it, otherwise add a block of the relevant size
+                if not hasattr(self, 'model'):
+                    self.model = Net(best_result.config['filter_size'], size=self.size)
+                    self.model.load_state_dict(checkpoint['model_state_dict'])
+                else:
+                    self.model.add_block(best_result.config['filter_size'])
+                    self.model.load_state_dict(checkpoint['model_state_dict'])
+                
+                accuracy = best_result.metrics['accuracy']
+                patience_counter = 0
+
             else:
-                self.model.add_block(best_result.config['filter_size'])
-                self.model.load_state_dict(checkpoint['model_state_dict'])
+                patience_counter += 1
 
         return results
 
