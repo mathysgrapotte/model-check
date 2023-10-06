@@ -1,4 +1,4 @@
-tuff not needed for commits
+#stuff not needed for commits
 
 /test*
 /bin/src/*/__pycache__/
@@ -11,3 +11,4 @@ tuff not needed for commits
 work
 data
 .DS_Store
+/singularity_cache
