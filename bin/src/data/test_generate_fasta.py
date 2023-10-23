@@ -30,7 +30,14 @@ class TestGenerateFasta(unittest.TestCase):
     """ test class for the GenerateFasta class """
     def setUp(self):
         """ sets up the test cases """
-        self.fasta = GenerateFasta("test.fasta", 10)
+        self.fasta = GenerateFasta(10)
+
+    def test_get_motif_from_jaspar(self):
+        """ tests the get_motif_from_jaspar method """
+        pwm = self.fasta.get_motif_from_jaspar("MA0001.1")
+        # check if the pwm is the right size, should be 4,10
+        self.assertEqual(pwm.shape, (4, 10))
+        
     
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import random
 from abc import ABC
 import numpy as np
+import pyjaspar
 
 class Fasta(ABC):
     """
@@ -105,6 +106,18 @@ class GenerateFasta(Fasta):
             start = random.randint(0, len(sequence) - len(motif))
         sequence = sequence[:start] + motif + sequence[start + len(motif):]
         return sequence
+    
+    def get_motif_from_jaspar(self, motif_id):
+        """ This function returns a motif from the jaspar database. """
+        jaspar_db = pyjaspar.jaspardb()
+        motif = jaspar_db.fetch_motif_by_id(motif_id)
+        # convert the motif pwm to a numpy array
+        # start by unrolling the dictionary contained in the motif.pwm attribute
+        unrolled = [np.array(motif.pwm[key]) for key in motif.pwm.keys()]
+        # stack the arrays
+        pwm = np.stack(unrolled)
+        return pwm
+    
 
 class GenerateSingleFixedMotifDataset(GenerateFasta):
     """ This class generates a simple balanced dataset with a single fixed motif being present in some sequences. Said sequences are associated a positive label where the non motif sequences are associated a negative label. """
