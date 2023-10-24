@@ -1,15 +1,15 @@
 
 process GENERATE_FASTA {
 
-    container 'clearlinux/numpy-mp:latest'
-    label 'process_low'
+    container "alessiovignoli3/model-check:dataload_training"
+    label "process_low"
 
     output:
     path "*", emit: dna_fasta
     stdout emit: standardout  
 
     script:
-    def args = task.ext.args ?: ''
+    def args = task.ext.args ?: ""
     def prefix = task.ext.prefix ?: "ENCODED"
     """
     launch_fasta_generate.py -o ${prefix} ${args} 

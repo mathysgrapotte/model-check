@@ -5,6 +5,7 @@ sys.path.append("..")
 from src.data.generate_fasta import Fasta
 from src.data.generate_fasta import GenerateFasta
 from src.data.generate_fasta import GenerateSingleFixedMotifDataset
+from src.data.generate_fasta import GenerateSingleJasparMotifDataset
 
 import unittest
 
@@ -38,6 +39,35 @@ class TestGenerateFasta(unittest.TestCase):
         # check if the pwm is the right size, should be 4,10
         self.assertEqual(pwm.shape, (4, 10))
         
+class TestGenerateSingleFixedMotifDataset(unittest.TestCase):
+    """ test class for the GenerateSingleFixedMotifDataset class """
+    def setUp(self):
+        """ sets up the test cases """
+        self.fasta = GenerateSingleFixedMotifDataset(10, "ACTG", "motif", "non_motif")
+        self.fasta.generate_dataset()
+
+    def test_generate_dataset(self):
+        """ tests the generate_dataset method """
+        # check if the sequences are of the right length
+        for sequence in self.fasta.sequences:
+            self.assertEqual(len(sequence), 10)
+
+
+class TestGenerateSingleJasparMotifDataset(unittest.TestCase):
+    """ test class for the GenerateSingleJasparMotifDataset class """
+    def setUp(self):
+        """ sets up the test cases """
+        self.fasta = GenerateSingleJasparMotifDataset(10, "MA0001.1")
+        self.fasta.generate_dataset(1000)
+
+    def test_generate_dataset_no_input_fasta(self):
+        """ tests the generate_dataset method """
+        # check if the sequences are of the right length
+        for sequence in self.fasta.sequences:
+            self.assertEqual(len(sequence), 10)
+
+        # check if some tags have a value that is not 0
+        self.assertTrue(any(tag != 0 for tag in self.fasta.tags))
     
 
 if __name__ == '__main__':

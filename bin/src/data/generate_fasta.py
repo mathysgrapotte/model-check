@@ -144,3 +144,42 @@ class GenerateSingleFixedMotifDataset(GenerateFasta):
             self.sequences.append(sequence)
             self.sequence_names.append(f"sequence_{i + self.number_of_sequences}")
             self.tags.append(self.non_motif_tag)
+
+class GenerateSingleJasparMotifDataset(GenerateFasta):
+    """ This class generate a Dataset with a single motif from the jaspar database. """
+    
+    def __init__(self, dna_sequence_length, jaspar_motif_id):
+        super().__init__(dna_sequence_length)
+        self.jaspar_motif = self.get_motif_from_jaspar(jaspar_motif_id)
+
+    def generate_dataset(self, number_of_sequences, motif_start=None, path_fasta=None):
+        # if the path to fasta is specified, load the fasta file
+        if path_fasta:
+            self.load_fasta(path_fasta)
+
+            # check if the sequences are of the right length, throw an error if not since it is not going to fit the model
+            for sequence in self.sequences:
+                assert len(sequence) == self.dna_sequence_length, "The sequences in the fasta file are not of the right length"
+
+        # otherwise generate number_of_sequences sequences randomly with their names
+        else:
+            for i in range(number_of_sequences):
+                sequence = self.generate_random_dna_sequence()
+                sequence_name = f"sequence_{i}"
+                self.sequences.append(sequence)
+                self.sequence_names.append(sequence_name)
+
+        # Then for half of the sequences, generate a motif from the jaspar pwm, then assess the match between the generated motif and the pwm, insert the motif in the sequence and add the motif/pwm match score to the tags
+        for i in range(number_of_sequences):
+            if i < number_of_sequences / 2:
+                # generate a motif from the jaspar pwm
+                motif = self.generate_motif_from_pwm(self.jaspar_motif)
+                # assess the match between the generated motif and the pwm
+                motif_score = self.assess_match_between_motif_and_pwm(motif, self.jaspar_motif)
+                # insert the motif in the sequence
+                self.sequences[i] = self.insert_motif_in_sequence(self.sequences[i], motif, motif_start)
+                # add the motif/pwm match score to the tags
+                self.tags.append(motif_score)
+            else:
+                # add a 0 tag to the sequences that do not have a motif
+                self.tags.append(0)
