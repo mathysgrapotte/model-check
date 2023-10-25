@@ -31,13 +31,13 @@ workflow {
     // TODO write all parameters flags to log file
     // both will happen when nf-core is introduced  
     fasta.view()
-    /*
+    
     message = CHECK_TRAINABLE( fasta )
     message.view()
 
     statistics = TRAIN( fasta )
     statistics.view()
-    */
+    
 }
 
 /*
