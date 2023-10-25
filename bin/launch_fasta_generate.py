@@ -12,7 +12,13 @@ def get_args():
 	parser = argparse.ArgumentParser(description="This script generates DNA sequence from a given starting motif.")
 	parser.add_argument("-o", "--out_name", type=str, required=True, metavar="FILE", help='The file path for the generated DNA sequences in fasta format.' )
 	parser.add_argument("-sl", "--seq_len", type=int, required=False, nargs='?', const=100, default=100, metavar="LEN", help='Length in integer for the DNA seqs to be created. Default 100.' )
-	parser.add_argument("-m", "--motif", type=str, required=False, nargs='?', const='aattttttttttttaa', default='aattttttttttttaa', metavar="SEQ", help='The motif sequence that is used to generate the DNA sequences for the positive set. default aattttttttttttaa .')
+
+	# Create a group so the following flags follow XOR logic, aka mutually exclusive.
+
+	group = parser.add_mutually_exclusive_group(required=True)
+	group.add_argument("-m", "--motif", type=str, metavar="FILE", help='The csv file containing the motif/s sequence/s that is/are used to generate the DNA sequences for the positive set. Based on the ammount of elemnts in the file either the single or multi class is called. if one motif is present then   GenerateSingleFixedMotifDataset  is called otherwise   GenerateMultiple*  is called. One between this and the following flag are mandatory. They are mutually exclusive.')
+	group.add_argument("-j", "--jaspar_id", type=str, metavar="FILE", help='The csv file containing the JASPAR id/s  used to generate the DNA sequences for the positive set. Based on the ammount of elemnts in the file either the single or multi class is called. (like above). One between this and the above flag are mandatory')
+
 	parser.add_argument("-t", "--motif_tag", type=int, required=False, nargs='?', const=5, default=5, metavar="LEN", help='TODO write description' )
 	parser.add_argument("-u", "--non_motif_tag", type=int, required=False, nargs='?', const=0, default=0, metavar="LEN", help='TODO write description' )
 	parser.add_argument("-ns", "--num_seq", type=int, required=False, nargs='?', const=1000, default=1000, metavar="TOT", help='The total number of DNA sequences the script generates. Default 1k.')
