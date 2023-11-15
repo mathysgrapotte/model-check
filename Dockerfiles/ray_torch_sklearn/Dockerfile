@@ -13,4 +13,5 @@ RUN pip install \
 		ray[rllib] \
         scipy==1.11.3 \ 
 		scikit-learn==1.3.1 \
-		pandas==2.1.1
+		pandas==2.1.1 \
+		pyjaspar==3.0.0

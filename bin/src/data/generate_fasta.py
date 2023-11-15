@@ -25,8 +25,8 @@ class Fasta(ABC):
         Self has to contain sequences, tags and names. 
         """
         
-        # check if sequences, sequences_names and tags are populated
-        assert len(self.sequences) == len(self.sequence_names) == len(self.tags), "sequences, sequences_names and tags have to be of the same length"
+        # check if sequences, sequences_names and tags are populated; if an error is thrown, print the length of each list
+        assert len(self.sequences) == len(self.sequence_names) == len(self.tags), f"The sequences, sequence_names and tags lists should have the same length. The sequences list has length {len(self.sequences)}, the sequence_names list has length {len(self.sequence_names)} and the tags list has length {len(self.tags)}"
         # check if there is at least one sequence
         assert len(self.sequences) > 0, "There should be at least one sequence"
 
@@ -55,7 +55,14 @@ class Fasta(ABC):
                     self.tags.append(float(tag.strip()))
                 else:
                     # this is a sequence
-                    self.sequences.append(line.strip())     
+
+                    # check if the sequence contains 'n' or 'N' and if so, remove the previously added tag and sequence names
+
+                    self.sequences.append(line.strip()) 
+
+    def get_sequence_length(self):
+        """ This function returns the length of the sequences in the fasta file. """
+        return len(self.sequences[0])
 
 class GenerateFasta(Fasta):
     """
@@ -157,9 +164,11 @@ class GenerateSingleJasparMotifDataset(GenerateFasta):
         if path_fasta:
             self.load_fasta(path_fasta)
 
-            # check if the sequences are of the right length, throw an error if not since it is not going to fit the model
-            for sequence in self.sequences:
-                assert len(sequence) == self.dna_sequence_length, "The sequences in the fasta file are not of the right length"
+            # check if the sequences are of the right length, throw an error if not since it is not going to fit the model, in the error message, also specify the length of the sequences in the fasta file and the user input
+            assert len(self.sequences[0]) == self.dna_sequence_length, f"The sequences in the fasta file are of length {len(self.sequences[0])} while the user input dna_sequence_length is {self.dna_sequence_length}"
+
+            # update the number_of_sequences variable
+            number_of_sequences = len(self.sequences)
 
         # otherwise generate number_of_sequences sequences randomly with their names
         else:

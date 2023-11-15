@@ -1,7 +1,7 @@
 
 process ONE_STEP_TRAIN {
 
-    container 'alessiovignoli3/model-check:ray_torch_sklearn'
+    container 'alessiovignoli3/model-check:dataload_training'
     label 'process_low'
     tag "${fasta}"
 

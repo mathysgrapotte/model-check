@@ -150,7 +150,7 @@ class MnnTrainer(Trainer):
             checkpoint = Checkpoint.from_dict({"epoch":epoch, "model_state_dict": self.model.state_dict()})
             session.report({"accuracy": accuracy, "loss": test_loss}, checkpoint=checkpoint)
 
-    def tune(self, search_space, num_samples=3, patience=2, threshold=0.05):
+    def tune(self, search_space, num_samples=25, patience=5, threshold=0.05):
         """
         tunes the hyperparameters of the model
 
@@ -187,6 +187,12 @@ class MnnTrainer(Trainer):
             best_result = results.get_best_result(metric='accuracy', mode='max')
             checkpoint = best_result.checkpoint.to_dict()
 
+            # print the best result accuracy
+            print(f'best result accuracy: {best_result.metrics["accuracy"]}')
+
+            # print the current accuracy
+            print(f'current accuracy: {accuracy}')
+
             # print the difference between previous accuracy and best result accuracy
             print(f'accuracy difference: {best_result.metrics["accuracy"] - accuracy}')
 
@@ -203,6 +209,9 @@ class MnnTrainer(Trainer):
                 
                 accuracy = best_result.metrics['accuracy']
                 patience_counter = 0
+
+                # print the model
+                print(self.model)
 
             else:
                 patience_counter += 1
