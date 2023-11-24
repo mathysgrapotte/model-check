@@ -57,8 +57,13 @@ class Fasta(ABC):
                     # this is a sequence
 
                     # check if the sequence contains 'n' or 'N' and if so, remove the previously added tag and sequence names
-
-                    self.sequences.append(line.strip()) 
+                    if 'n' in line or 'N' in line:
+                        self.sequence_names.pop()
+                        self.tags.pop()
+                    
+                    else:
+                        
+                        self.sequences.append(line.strip()) 
 
     def get_sequence_length(self):
         """ This function returns the length of the sequences in the fasta file. """
@@ -169,6 +174,10 @@ class GenerateSingleJasparMotifDataset(GenerateFasta):
 
             # update the number_of_sequences variable
             number_of_sequences = len(self.sequences)
+
+            # reset the tag list to empty for generation
+            self.tags = []
+
 
         # otherwise generate number_of_sequences sequences randomly with their names
         else:
