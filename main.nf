@@ -38,6 +38,7 @@ workflow {
     TRAIN( fasta, message )
     TRAIN.out.trained_model.view()
     TRAIN.out.statistics.view()
+    TRAIN.out.stout.view()
     
 }
 

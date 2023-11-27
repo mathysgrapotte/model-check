@@ -9,19 +9,20 @@ process TRAIN_MODEL {
     path fasta
 
     output:
+    path "*.pt", emit: best_model
+    path "train_statistics.txt", emit: statistics
     stdout emit: standardout
 
     script:
     def args = task.ext.args ?: ''
     """
-    launch_training.py -i ${fasta} ${args}
+    launch_training.py -i ${fasta} ${args} 1>train_statistics.txt
     """
 
     stub:
-    // first reduce the input sequernces to 10 in total so that is faster to run
     """
-    awk '/^>/{n++;if(n<=10){print}} n>10{exit} !/^>/'  ${fasta} > tmp
-    launch_training.py -i tmp -bs 1,10 -e 1 --modules_version True
+    launch_training.py -i ${fasta} -e 2 --modules_version True 1>train_statistics.txt
+    head -n 4 train_statistics.txt 
     """
 
 }
