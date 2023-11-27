@@ -10,7 +10,7 @@ process TRAIN_MODEL {
 
     output:
     path "*.pt", emit: best_model
-    path "train_statistics.txt", emit: statistics
+    path "*.txt", emit: statistics
     stdout emit: standardout
 
     script:

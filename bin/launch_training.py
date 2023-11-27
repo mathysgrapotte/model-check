@@ -60,8 +60,10 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
 	best_result = dfs.get_best_result(metric='accuracy', mode='max')
 	checkpoint = best_result.checkpoint.to_dict()
 
-	# save the best model
+	# save the best model and model architecture
 	torch.save(mnn_trainer.model.state_dict(), 'best_model.pt')
+	with open("architecture.txt", 'w') as arch_out:
+		arch_out.write( str( mnn_trainer.model.get_hyper_parameters() ) )
 
 	# printing accuracy of the best model
 	print("printing accuracy of the best model")
