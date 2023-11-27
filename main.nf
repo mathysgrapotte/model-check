@@ -35,8 +35,9 @@ workflow {
     message = CHECK_TRAINABLE( fasta )
     message.view()
 
-    statistics = TRAIN( fasta )
-    statistics.view()
+    TRAIN( fasta, message )
+    TRAIN.out.trained_model.view()
+    TRAIN.out.statistics.view()
     
 }
 
