@@ -26,13 +26,34 @@ class Fasta(ABC):
         """
         
         # check if sequences, sequences_names and tags are populated; if an error is thrown, print the length of each list
-        assert len(self.sequences) == len(self.sequence_names) == len(self.tags), f"The sequences, sequence_names and tags lists should have the same length. The sequences list has length {len(self.sequences)}, the sequence_names list has length {len(self.sequence_names)} and the tags list has length {len(self.tags)}"
+        assert len(self.sequences) == len(self.sequence_names) == len(self.tags), f"The sequences, sequence_names and tags lists should have the same length. The sequences list is of length {len(self.sequences)}, the sequence_names list is of length {len(self.sequence_names)} and the tags list is of length {len(self.tags)}"
         # check if there is at least one sequence
         assert len(self.sequences) > 0, "There should be at least one sequence"
 
         with open(path_to_write, 'w') as fasta_file:
             for sequence, sequence_name, tag in zip(self.sequences, self.sequence_names, self.tags):
                 fasta_file.write(f">{sequence_name}|{tag}\n")
+                fasta_file.write(sequence + '\n')
+
+    def write_fasta_without_tags(self, path_to_write):
+        """
+        This function is a helper function for writing a fasta file taking as input self. 
+        Fasta should be the following format : 
+        
+        >sequence_name
+        sequence
+
+        Self has to contain sequences and names. 
+        """
+        
+        # check if sequences and sequences_names are populated; if an error is thrown, print the length of each list
+        assert len(self.sequences) == len(self.sequence_names), f"The sequences and sequence_names lists should have the same length. The sequences list is of length {len(self.sequences)} and the sequence_names list is of length {len(self.sequence_names)}"
+        # check if there is at least one sequence
+        assert len(self.sequences) > 0, "There should be at least one sequence"
+
+        with open(path_to_write, 'w') as fasta_file:
+            for sequence, sequence_name in zip(self.sequences, self.sequence_names):
+                fasta_file.write(f">{sequence_name}\n")
                 fasta_file.write(sequence + '\n')
 
     def load_fasta(self, path_to_read):
@@ -55,15 +76,37 @@ class Fasta(ABC):
                     self.tags.append(float(tag.strip()))
                 else:
                     # this is a sequence
-
                     # check if the sequence contains 'n' or 'N' and if so, remove the previously added tag and sequence names
                     if 'n' in line or 'N' in line:
                         self.sequence_names.pop()
-                        self.tags.pop()
-                    
-                    else:
-                        
-                        self.sequences.append(line.strip()) 
+                        self.tags.pop()        
+                    else:                      
+                        self.sequences.append(line.strip())
+
+    def load_fasta_without_tags(self, path_to_read):
+        """
+        This function is a helper function for loading a fasta file taking as input self. 
+        Fasta should be the following format : 
+        
+        >sequence_name
+        sequence
+
+        Self has to contain sequences and names. 
+        """
+        with open(path_to_read, 'r') as fasta_file:
+            for line in fasta_file:
+                if line[0] == '>':
+                    # this is a sequence name
+                    sequence_name = line[1:].strip()
+                    self.sequence_names.append(sequence_name)
+                else:
+                    # this is a sequence
+
+                    # check if the sequence contains 'n' or 'N' and if so, remove the previously added sequence name
+                    if 'n' in line or 'N' in line:
+                        self.sequence_names.pop()                   
+                    else:                     
+                        self.sequences.append(line.strip())
 
     def get_sequence_length(self):
         """ This function returns the length of the sequences in the fasta file. """
