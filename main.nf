@@ -32,7 +32,7 @@ workflow {
     HANDLE_FASTA()
     fasta = HANDLE_FASTA.out.fasta
     fasta_message = HANDLE_FASTA.out.completition_message 
-    println "fasta file used for the training   : ${fasta_message}"
+    fasta_message.view()
 
     message = CHECK_TRAINABLE( fasta )
     message.view()

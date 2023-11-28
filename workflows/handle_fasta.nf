@@ -27,7 +27,7 @@ workflow HANDLE_FASTA {
     }
 
     fasta = ''
-    completition_message = "${params.outdir}/generated.fasta"
+    completition_message = "fasta file used for the training   : ${params.outdir}/generated.fasta"
     if ( params.input_fasta ) {
         fasta = Channel.fromPath( params.input_fasta )
         completition_message = "${params.input_fasta}"
