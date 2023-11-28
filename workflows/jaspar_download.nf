@@ -25,9 +25,13 @@ workflow JASPAR_DOWNLOAD {
         completition_message = '\n# skipped homer for verifying motif learnt by model\n'
 
     } else {
+
+        // get to motif id level, because that is what is going to be downloaded
         jaspar_id_file = Channel.fromPath( params.jaspar )
-        QUERY_JASPAR( jaspar_id_file  )
-        completition_message = QUERY_JASPAR.out.standardout
+        motif_id = jaspar_id_file.splitCsv( strip: true ).flatten().filter{ it != '' }
+
+        QUERY_JASPAR( motif_id  )
+        completition_message = QUERY_JASPAR.out.standardout.filter{ it != '' }
 
     }
 

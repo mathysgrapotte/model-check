@@ -1,26 +1,47 @@
 
 process QUERY_JASPAR {
 
-    container "python@sha256:9b009a025fa0c270a1617086d74bde1f7015fdcb8a8447aca14ec0de78d99f74" // Python 3.10 slim-bullseye
+    container "alessiovignoli3/model-check:jaspar_api"  // Python 3.10 slim-bullseye + corepai-cli 1.0.9
     label "process_low"
+    tag "${jaspar_motif_id}"
 
     input:
-    path jaspar_motif
+    val jaspar_motif_id
 
     output:
-    //path "*", emit: dna_fasta
+    path "*.jaspar", emit: jaspar_pwm
     stdout emit: standardout
 
     script:
     """
-    echo bubba
+    coreapi get https://jaspar.elixir.no/api/v1/docs/ > tmp
+
+    # preventing coreapi to send error message on not found id
+    coreapi action matrix read -p matrix_id=${jaspar_motif_id} 1>motif_${jaspar_motif_id}.jaspar || [[ \$? == 1 ]]
+
+    # if no id was found the file first line contains the error message
+    if [[ \$( head -n 1 motif_${jaspar_motif_id}.jaspar | grep 'Error') ]] ;
+    then
+        echo "###  WARNING   motif ID not found : ${jaspar_motif_id} "
+    else
+        exit 0                                          ## exiting with no error
+    fi
     """
 
     stub:
-    //def args = task.ext.args ?: ""
-    //def prefix = task.ext.prefix ?: "generated.fasta"
     """
-     -n 
+    coreapi get https://jaspar.elixir.no/api/v1/docs/ > tmp
+
+    # preventing coreapi to send error message on not found id 
+    coreapi action matrix read -p matrix_id=${jaspar_motif_id} 1>motif_${jaspar_motif_id}.jaspar || [[ \$? == 1 ]]  
+
+    # if no id was found the file first line contains the error message 
+    if [[ \$( head -n 1 motif_${jaspar_motif_id}.jaspar | grep 'Error') ]] ; 
+    then
+        echo "###  WARNING   motif ID not found : ${jaspar_motif_id} "
+    else
+        exit 0                                          ## exiting with no error
+    fi
     """
 
 }

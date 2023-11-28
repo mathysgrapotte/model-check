@@ -31,16 +31,16 @@ workflow {
     // TODO make a nicer print of the filename
     // TODO write all parameters flags to log file
 	
-    HANDLE_FASTA()
+    /*HANDLE_FASTA()
     fasta          = HANDLE_FASTA.out.fasta
     fasta_message  = HANDLE_FASTA.out.completition_message 
     fasta_message.view()
-
+    */
     JASPAR_DOWNLOAD()
     jaspar_db      = JASPAR_DOWNLOAD.out.db
     jaspar_message = JASPAR_DOWNLOAD.out.completition_message
     jaspar_message.view()
-
+    /*
     CHECK_TRAINABLE( fasta )
     check_message  = CHECK_TRAINABLE.out.message
     check_message.view()
@@ -52,6 +52,7 @@ workflow {
     VERIFY_TRAINED( jaspar_db )
     verify_message = VERIFY_TRAINED.out.completition_message
     verify_message.view()    
+    */
 }
 
 workflow.onComplete {
