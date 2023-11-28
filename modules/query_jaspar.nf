@@ -20,7 +20,7 @@ process QUERY_JASPAR {
     //def args = task.ext.args ?: ""
     //def prefix = task.ext.prefix ?: "generated.fasta"
     """
-    echo ${jaspar_motif}
+     -n 
     """
 
 }
