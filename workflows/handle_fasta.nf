@@ -27,8 +27,10 @@ workflow HANDLE_FASTA {
     }
 
     fasta = ''
+    completition_message = "${params.outdir}/generated.fasta"
     if ( params.input_fasta ) {
         fasta = Channel.fromPath( params.input_fasta )
+        completition_message = "${params.input_fasta}"
 
     } else if ( params.jaspar ) {
         jaspar_id_file = Channel.fromPath( params.jaspar )
@@ -66,6 +68,7 @@ workflow HANDLE_FASTA {
     emit:
 
     fasta
+    completition_message
 
 }
 

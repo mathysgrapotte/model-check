@@ -26,18 +26,25 @@ include { TRAIN } from './workflows/train.nf'
 
 workflow {
 
-    fasta = HANDLE_FASTA()
     // TODO make a nicer print of the filename
     // TODO write all parameters flags to log file
-    // both will happen when nf-core is introduced  
-    fasta.view()
-    
+	
+    HANDLE_FASTA()
+    fasta = HANDLE_FASTA.out.fasta
+    fasta_message = HANDLE_FASTA.out.completition_message 
+    println "fasta file used for the training   : ${fasta_message}"
+
     message = CHECK_TRAINABLE( fasta )
     message.view()
 
-    statistics = TRAIN( fasta )
-    statistics.view()
+    TRAIN( fasta, message )
+    TRAIN.out.stout.view()
     
+}
+
+workflow.onComplete {
+    println "best model parameter file          : ${params.outdir}/model/best_model.pt "
+    println "model architecture dictionary file : ${params.outdir}/model/architecture.txt"
 }
 
 /*
