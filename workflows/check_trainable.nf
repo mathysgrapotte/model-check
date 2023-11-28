@@ -24,7 +24,7 @@ workflow CHECK_TRAINABLE {
     
     message = ''
     if ( params.skip_check ) {
-	message = 'skipped checks'
+	message = '\n# skipped check of trainability of the model\n'
     } else {
         message = ONE_STEP_TRAIN( input_fasta )
     }

@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { TRAIN_MODEL } from '../modules/train_model.nf'
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -13,33 +13,37 @@ include { TRAIN_MODEL } from '../modules/train_model.nf'
 */
 
 
-workflow TRAIN {
+workflow VERIFY_TRAINED {
 
     take:
 
-    fasta
-    passed_check			// used just to enforce dependency from the check train step 
+    jaspar_db
+
 
     main:
- 
-    TRAIN_MODEL(fasta)
-    trained_model = TRAIN_MODEL.out.best_model
-    statistics = TRAIN_MODEL.out.statistics
-    message = TRAIN_MODEL.out.standardout
+
+
+    completition_message = ''
+    
+    if ( params.skip_homer || params.input_fasta ) {
+        //completition_message = '\n# skipped homer for verifying motif learnt by model\n'
+
+    } else {
+        
+        completition_message = 'homer section'
+    
+    }
+
 
     emit:
 
-    trained_model
-    statistics
-    message
+    completition_message
 
 }
-
 
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
+*/ 

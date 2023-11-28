@@ -56,7 +56,7 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
               'batch_size':tune.choice( batch_ranges )}
 
 	# run a tune run
-	dfs = mnn_trainer.tune(search_space=config, num_samples=5)
+	dfs = mnn_trainer.tune(search_space=config, num_samples=3)
 	best_result = dfs.get_best_result(metric='accuracy', mode='max')
 	checkpoint = best_result.checkpoint.to_dict()
 
