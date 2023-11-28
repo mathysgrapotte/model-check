@@ -48,6 +48,84 @@ class MnnHomerForegroundBackgroundSetup(ABC):
         self.input_fasta.load_fasta(path_input_fasta)
         self.input_fasta_dataset = fastaDataset(path_input_fasta)
         self.input_fasta_data_loader = DataLoader(self.input_fasta_dataset, batch_size=1, shuffle=False)
+        self.model = Net()
+        self.model.build_model(path_hyper_params)
+        self.model.load_state_dict(torch.load(path_params))
 
-    def scan_sequences(self, x):
-        pass
+    def scan_sequences(self, module_id='last'):
+        """
+        For the selected module (last if it's the last module, otherwise should be an int).
+        Then, at each position, if the output is positive, extract the sequences from the input fasta corresponding to the range [starting position, starting position + filter size]
+        Store that sequence in the positive hit fasta, with a label corresponding to the sequence name.
+        Do the same for the negative hits
+
+        @return: None
+        """
+
+        # setting device
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        # setting model to eval mode
+        self.model.eval()
+
+        # for each sequence in the input fasta
+        for batch_idx, (data, target, name) in enumerate(self.input_fasta_data_loader):
+            # send data to device
+            data, target = data.to(device), target.to(device)
+
+            # convert data and target to float
+            data = data.float()
+
+            # forward
+            output = self.model.get_convolution_output_per_block(data, module_id)
+
+            # reshape output to match target shape
+
+            # for each position in the output
+            for i in range(output.shape[1]):
+
+                
+                # get the sequence from the input fasta
+                sequence = self.input_fasta[0][i:i+self.model.filter_size]
+                name_sequence = name[0] + "_" + str(i) + "_" + str(i+self.model.filter_size)
+
+                # if the output is positive
+                if output[0][i] > 0:
+                    # add the sequence to the positive hit fasta
+                    self.positive_hit_fasta.sequences.append(sequence)
+                    self.positive_hit_fasta.names.append(name_sequence)
+                else:
+                    # add the sequence to the negative hit fasta
+                    self.negative_hit_fasta.sequences.append(sequence)
+                    self.negative_hit_fasta.names.append(name_sequence)
+
+    def scan_for_all_modules_and_save(self, path_to_folder):
+        """
+        For each module, scan the sequences and save the positive and negative hits to the given folder
+
+        @param path_to_folder: the path to the folder to save the positive and negative hits to
+
+        @return: None
+        """
+        # for the first module
+        self.scan_sequences('last')
+
+        # write the fastas
+        self.write_fastas(path_to_folder + "module_last")
+
+        # reset the fastas
+        self.positive_hit_fasta = Fasta()
+        self.negative_hit_fasta = Fasta()
+        
+
+        # for each module
+        for i in range(len(self.model.blocks) + 1):
+            # scan the sequences
+            self.scan_sequences(i)
+
+            # write the fastas
+            self.write_fastas(path_to_folder + "module_" + str(i))
+
+            # reset the fastas
+            self.positive_hit_fasta = Fasta()
+            self.negative_hit_fasta = Fasta()
