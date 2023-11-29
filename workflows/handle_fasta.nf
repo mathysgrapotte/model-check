@@ -16,7 +16,9 @@ include { GENERATE_FROM_FASTA } from '../modules/generate_from_fasta.nf'
 
 workflow HANDLE_FASTA {
 
+
     main:
+
 
     // first create a channel for the base fasta file if necessary
     // this file is the one used to enrich on 
@@ -26,11 +28,17 @@ workflow HANDLE_FASTA {
         base_fasta =  Channel.fromPath( params.generate_from_fasta )
     }
 
-    fasta = ''
-    completition_message = "${params.outdir}/generated.fasta"
+
+    // the folowing variables act as switches or have different behavior in case 
+    // the generation of the fasta is not needed
+    fasta                = ''
+    completition_message = "\n# fasta file used for the training   : ${params.outdir}/generated.fasta\n"
+
+
     if ( params.input_fasta ) {
         fasta = Channel.fromPath( params.input_fasta )
-        completition_message = "${params.input_fasta}"
+        completition_message = "\n# fasta file used for the training   : ${params.input_fasta}\n"
+
 
     } else if ( params.jaspar ) {
         jaspar_id_file = Channel.fromPath( params.jaspar )
@@ -45,6 +53,7 @@ workflow HANDLE_FASTA {
        		GENERATE_FASTA.out.standardout.view()
 	}
 
+
     } else if ( params.motif ) {
         motif_file =  Channel.fromPath( params.motif )
 
@@ -58,11 +67,12 @@ workflow HANDLE_FASTA {
         	GENERATE_FASTA.out.standardout.view()
 	}
 
+
     } else {
         log.info("at least one of the following flags has to be given as input: input_fasta, jaspar, motif\nLook for more details about them in the nextflow.config")
         exit 1
-
     }
+
 
 
     emit:
