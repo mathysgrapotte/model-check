@@ -9,7 +9,7 @@ process QUERY_JASPAR {
     val jaspar_motif_id
 
     output:
-    path "*.jaspar", emit: jaspar_pwm
+    path "*.jaspar", emit: jaspar_pwm, optional: true
     stdout emit: standardout
 
     script:
@@ -23,6 +23,7 @@ process QUERY_JASPAR {
     if [[ \$( head -n 1 motif_${jaspar_motif_id}.jaspar | grep 'Error') ]] ;
     then
         echo "###  WARNING   motif ID not found : ${jaspar_motif_id} "
+        rm motif_${jaspar_motif_id}.jaspar
     else
         exit 0                                          ## exiting with no error
     fi
@@ -39,6 +40,7 @@ process QUERY_JASPAR {
     if [[ \$( head -n 1 motif_${jaspar_motif_id}.jaspar | grep 'Error') ]] ; 
     then
         echo "###  WARNING   motif ID not found : ${jaspar_motif_id} "
+        rm motif_${jaspar_motif_id}.jaspar
     else
         exit 0                                          ## exiting with no error
     fi
