@@ -18,6 +18,7 @@ include { JASPAR_DOWNLOAD } from './workflows/jaspar_download.nf'
 include { CHECK_TRAINABLE } from './workflows/check_trainable.nf'
 include { TRAIN           } from './workflows/train.nf'
 include { VERIFY_TRAINED  } from './workflows/verify_trained.nf'
+include { PLOT_MODEL} from './workflows/plot_model.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -47,12 +48,15 @@ workflow {
 
     TRAIN( fasta, check_message )
     train_message  = TRAIN.out.message
+    architecture   = TRAIN.out.architecture
+    trained_model  = TRAIN.out.trained_model
     train_message.view()
 
     VERIFY_TRAINED( jaspar_db )
     verify_message = VERIFY_TRAINED.out.completition_message
     verify_message.view()    
-    
+
+    PLOT_MODEL( architecture, trained_model )
 
 }
 

@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { TRAIN_MODEL } from '../modules/train_model.nf'
+include {   PLOT_MODEL_WEIGHTS } from '../modules/plot_model_weights.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -13,27 +13,21 @@ include { TRAIN_MODEL } from '../modules/train_model.nf'
 */
 
 
-workflow TRAIN {
+workflow PLOT_MODEL{
 
     take:
 
-    fasta
-    passed_check			// used just to enforce dependency from the check train step 
+    architecture
+    trained_model
 
     main:
  
-    TRAIN_MODEL(fasta)
-    trained_model = TRAIN_MODEL.out.best_model
-    statistics    = TRAIN_MODEL.out.statistics
-    message       = TRAIN_MODEL.out.standardout
-    architecture  = TRAIN_MODEL.out.architecture
+    PLOT_MODEL_WEIGHTS(architecture, trained_model)
+    plots = PLOT_MODEL_WEIGHTS.out.weights_plots
 
     emit:
 
-    trained_model
-    architecture
-    statistics
-    message
+    plots
 
 }
 
@@ -44,4 +38,3 @@ workflow TRAIN {
     THE END
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-

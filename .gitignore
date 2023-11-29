@@ -3,6 +3,7 @@
 /test*
 /bin/src/*/__pycache__/
 /bin/*/__pycache__/
+/bin/__pycache__/
 /__pycache__
 /.ipynb_checkpoints
 /notebook/.ipynb_checkpoints
