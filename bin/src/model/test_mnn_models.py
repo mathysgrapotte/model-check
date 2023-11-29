@@ -2,6 +2,7 @@
 import unittest
 import torch
 import sys
+import os
 from torch import nn
 from torch.nn import functional as F
 sys.path.append("..")
@@ -107,6 +108,23 @@ class TestNet(unittest.TestCase):
 
         # then, check if the last block is the same
         self.assertEqual(new_net.last_block.filter_size, net.last_block.filter_size)
+
+    def test_saving_cnn_filter_logo(self):
+        """test saving a cnn filter logo"""
+
+        # first, generate a couple of filter sizes and one sequence size
+        filter_sizes = [3, 5, 7]
+        sequence_size = 101
+
+        # then, initialize a net with the first filter size, and the sequence_size
+        net = Net(filter_sizes[0], sequence_size)
+
+        # then, save the logo of the convolution filter weight
+        net.save_convolution_weight_logo_for_block("test")
+
+        # check the the file exists
+        
+        self.assertTrue(os.path.exists("test_last.png"))
 
 if __name__ == '__main__':
     unittest.main()
