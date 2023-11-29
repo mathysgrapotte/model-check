@@ -18,7 +18,7 @@ include { JASPAR_DOWNLOAD } from './workflows/jaspar_download.nf'
 include { CHECK_TRAINABLE } from './workflows/check_trainable.nf'
 include { TRAIN           } from './workflows/train.nf'
 include { VERIFY_TRAINED  } from './workflows/verify_trained.nf'
-include { PLOT_MODEL} from './workflows/plot_model.nf'
+include { PLOT_MODEL      } from './workflows/plot_model.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
