@@ -16,6 +16,7 @@ nextflow.enable.dsl = 2
 include { HANDLE_FASTA } from './workflows/handle_fasta.nf'
 include { CHECK_TRAINABLE } from './workflows/check_trainable.nf'
 include { TRAIN } from './workflows/train.nf'
+include { PLOT_MODEL} from './workflows/plot_model.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,6 +40,11 @@ workflow {
 
     TRAIN( fasta, message )
     TRAIN.out.stout.view()
+    architecture = TRAIN.out.architecture
+    trained_model = TRAIN.out.trained_model
+
+    PLOT_MODEL( architecture, trained_model )
+
     
 }
 
