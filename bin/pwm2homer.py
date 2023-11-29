@@ -20,14 +20,15 @@ from Bio import motifs
 from Bio.motifs import jaspar
 import numpy as np
 import pandas as pd
-"""import multiprocessing
+"""
+import multiprocessing
 try:
     cpus = multiprocessing.cpu_count()
 except NotImplementedError:
     cpus = 2   # arbitrary default
-
-from typing import IO, List
 """
+from typing import IO, List
+
 def getHomerLogOdd(
     motif:motifs.Motif,
     mismatch:int=0,
@@ -231,7 +232,8 @@ def getLogOddThresholdList(
     #thresholdList=[ar.get() for ar in asyncThresholdList]
     thresholdList = []
     for i in range(len(motifList)):
-        thresholdList[i]=getLogOddThreshold(motifList[i], method=method, *args, **kwargs)
+        tmp=getLogOddThreshold(motifList[i], method=method, *args, **kwargs)
+        thresholdList.append(tmp)
     return thresholdList
 
 
@@ -348,7 +350,7 @@ def main():
     eps=args.eps
     pValue=args.pValue
     precision=args.precision
-    """# read motifs from input (stdin or file)
+    # read motifs from input (stdin or file)
     motifList = readMotifFile(input, format=format)
     # set pseudocounts to avoid issues
     setPseudoCounts(motifList)
@@ -371,9 +373,9 @@ def main():
     homerString = motifList2homerString(motifList)
     output.write(homerString)
     output.flush()
-    """
+    
     # print dependencies version
-    if eval(modules_version):
+    if eval( args.modules_version ):
         import Bio
         import sys
         print('python :', sys.version, '\n',  'numpy :', np.__version__, '\n', 'pandas :', pd.__version__, '\n', 'Bio :', Bio.__version__) 

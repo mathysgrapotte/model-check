@@ -20,7 +20,7 @@ workflow JASPAR_DOWNLOAD {
 
 
     completition_message = ''
-    db = ''
+    db                   = ''
 
     if ( params.skip_homer || params.input_fasta ) {
         completition_message = '\n# skipped homer for verifying motif learnt by model\n'
@@ -32,12 +32,13 @@ workflow JASPAR_DOWNLOAD {
         motif_id             = jaspar_id_file.splitCsv( strip: true ).flatten().filter{ it != '' }
 
         QUERY_JASPAR( motif_id )
-        jaspar_pwm          = QUERY_JASPAR.out.jaspar_pwm
+        jaspar_pwm           = QUERY_JASPAR.out.jaspar_pwm
         completition_message = QUERY_JASPAR.out.standardout.filter{ it != '' }
 
         // transform jaspaer output into homer readable one
         JASPAR_TO_HOMER( jaspar_pwm )
-        JASPAR_TO_HOMER.out.standardout.view()
+        db                   = JASPAR_TO_HOMER.out.homer_matrix
+        JASPAR_TO_HOMER.out.standardout.first().view()
 
     }
 
