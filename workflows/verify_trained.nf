@@ -17,6 +17,9 @@ workflow VERIFY_TRAINED {
 
     take:
 
+    input_fasta
+    model_architecture                     // hyperparameters
+    trained_model                          // parameters
     jaspar_db
 
 

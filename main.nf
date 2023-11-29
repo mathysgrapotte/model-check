@@ -52,7 +52,7 @@ workflow {
     trained_model  = TRAIN.out.trained_model
     train_message.view()
 
-    VERIFY_TRAINED( jaspar_db )
+    VERIFY_TRAINED( fasta, architecture, trained_model, jaspar_db )
     verify_message = VERIFY_TRAINED.out.completition_message
     verify_message.view()    
 
