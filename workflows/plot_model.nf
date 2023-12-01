@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include {   PLOT_MODEL_WEIGHTS } from '../modules/plot_model_weights.nf'
+include { PLOT_MODEL_WEIGHTS } from '../modules/plot_model_weights.nf'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -23,11 +23,13 @@ workflow PLOT_MODEL{
     main:
  
     PLOT_MODEL_WEIGHTS(architecture, trained_model)
-    plots = PLOT_MODEL_WEIGHTS.out.weights_plots
+    plots   = PLOT_MODEL_WEIGHTS.out.weights_plots
+    message = PLOT_MODEL_WEIGHTS.out.standardout
 
     emit:
 
     plots
+    message
 
 }
 

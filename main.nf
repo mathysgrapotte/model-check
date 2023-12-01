@@ -57,6 +57,8 @@ workflow {
     verify_message.view()    
 
     PLOT_MODEL( architecture, trained_model )
+    plot_message = PLOT_MODEL.out.message
+    plot_message.view()
 
 }
 

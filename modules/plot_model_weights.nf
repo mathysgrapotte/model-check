@@ -10,6 +10,7 @@ process PLOT_MODEL_WEIGHTS {
 
     output:
     path "*.png", emit: weights_plots  
+    stdout emit: standardout
 
     script:
     """
@@ -19,9 +20,12 @@ process PLOT_MODEL_WEIGHTS {
     stub:
     """
     #!/usr/bin/env python3
-   
+     
+    import sys
+    import torch
+
     # print module versions and a fake image 
-    print('python :', sys.version, '\n', 'torch :', torch.__version__)
+    print('python :', sys.version, '\\n', 'torch :', torch.__version__)
 
     with open('placeholder.png', 'w') as PNG:
         PNG.write('Hello world, you have run stub-run mode. no plot here, go home.')
