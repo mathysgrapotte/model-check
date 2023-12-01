@@ -22,17 +22,22 @@ def get_args():
     parser.add_argument("-hp", "--hyper_params", type=str, required=True, metavar="FILE", help='The file path for the hyper parameters of the model.')
     parser.add_argument("-p", "--params", type=str, required=True, metavar="FILE", help='The file path for the parameters of the model.')
     parser.add_argument("-o", "--output", type=str, required=False, metavar="FILE", default="output/", help='The file path for the output folder.')
+    parser.add_argument("--modules_version", type=str, required=False, nargs='?', const='False', default='False', metavar='VERBOSE', help='auxiliary flag top check module version used byt this script.')
     args = parser.parse_args()
     return args
 
-def main(hyper_params, params, infasta , output):
+def main(hyper_params, params, infasta, output, modules_version='False'):
     # initialize the homer foreground background setup class
     hyper_params = read_dictionary_from_file(hyper_params)
     homer_foreground_background_setup = MnnHomerForegroundBackgroundSetup(hyper_params, params, infasta)
     homer_foreground_background_setup.scan_for_all_modules_and_save(output)
 
+    if eval(modules_version):
+        import sys
+        print('python :', sys.version)
+
 if __name__ == "__main__":
 	
     args = get_args()
     
-    main(args.hyper_params, args.params, args.infasta, args.output)
+    main(args.hyper_params, args.params, args.infasta, args.output, args.modules_version)

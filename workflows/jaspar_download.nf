@@ -22,8 +22,8 @@ workflow JASPAR_DOWNLOAD {
     completition_message = ''
     db                   = ''
 
-    if ( params.skip_homer || params.input_fasta ) {
-        completition_message = '\n# skipped homer for verifying motif learnt by model\n'
+    if ( params.skip_homer || params.input_fasta || !params.jaspar ) {
+        completition_message = '\n# skipped jaspar download and formatting \n'
 
     } else {
 

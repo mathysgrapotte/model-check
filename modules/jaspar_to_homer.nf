@@ -15,13 +15,13 @@ process  JASPAR_TO_HOMER {
     script:
     out_name = "${jaspar_pwm_file.baseName}.homer"
     """
-    pwm2homer.py -i ${jaspar_pwm_file} -o ${out_name} -f jaspar 
+    launch_pwm2homer.py -i ${jaspar_pwm_file} -o ${out_name} -f jaspar 
     """
 
     stub:
     out_name = "${jaspar_pwm_file.baseName}.homer"
     """
-    pwm2homer.py -i ${jaspar_pwm_file} -o ${out_name} -f jaspar --modules_version True
+    launch_pwm2homer.py -i ${jaspar_pwm_file} -o ${out_name} -f jaspar --modules_version True
     """
 
 }
