@@ -39,9 +39,18 @@ workflow VERIFY_TRAINED {
 
 
 	// pair the positive set with the negative one using the motif and convolution filter number as key
-        posive_set           = CONVOLUTION_SCAN.out.positve_set.flatten().map{ it -> [ ("${it.baseName}".split('_')[0] + '_' + "${it.baseName}".split('_')[-1]), it ] }
-        negative_set         = CONVOLUTION_SCAN.out.negative_set.flatten().map{ it -> [ ("${it.baseName}".split('_')[0] + '_' + "${it.baseName}".split('_')[-1]), it ] }
-	paired_sets          = posive_set.combine( negative_set, by:0 )
+        // also retrieving the filter length from the file name
+        posive_set           = CONVOLUTION_SCAN.out.positve_set.flatten().map{ 
+                                             it 
+                                                   -> [ ("${it.baseName}".split('_')[0] + '_' + "${it.baseName}".split('_')[-2]), \
+                                                      "${it.baseName}".split('_')[-1], \
+                                                      it ] }
+        negative_set         = CONVOLUTION_SCAN.out.negative_set.flatten().map{ 
+                                             it
+                                                   -> [ ("${it.baseName}".split('_')[0] + '_' + "${it.baseName}".split('_')[-2]), \
+                                                      "${it.baseName}".split('_')[-1], \
+                                                      it ] }
+	paired_sets          = posive_set.combine( negative_set, by:[0, 1] )
 
 
         // Handle the case when there is no jaspar db in input

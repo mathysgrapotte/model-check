@@ -1,12 +1,15 @@
 
 process HOMER_FIND_MOTIF {
 
-    container 'mgibio/homer@sha256:8a71ac97e2c862d84842a4c9d52a49aa7804790952c286f3219d411b6fce7b4f'   // 
+    // the following is to handle both singularity and docker while using a biocontainer
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/homer:4.11--pl526hc9558a2_3' :
+        'biocontainers/homer:4.11--pl526hc9558a2_3' }"                                                   // homer 4.11 and perl 5.26.2
     label "process_medium"
     tag "${id}"
 
     input:
-    tuple val(id), path(positve_set), path(negative_set)
+    tuple val(id), val(filter_len), path(positve_set), path(negative_set)
 
     output:
     //path( "*positive*.fasta" ), emit: positve_set
@@ -19,6 +22,6 @@ process HOMER_FIND_MOTIF {
 
     stub:
     """
-    echo ${id} ${positve_set} ${negative_set} 
+    findMotifs.pl ${positve_set} fasta tmp -fasta ${negative_set} -len ${filter_len}
     """
 }
