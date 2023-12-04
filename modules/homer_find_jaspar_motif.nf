@@ -18,11 +18,16 @@ process HOMER_FIND_JASPAR_MOTIF {
 
     script:
     """
-    echo bubba
+    findMotifs.pl ${positve_set} fasta tmp -fasta ${negative_set} -len ${filter_len} -norevopp -mcheck ${jaspar_db} -mknown ${jaspar_db}
     """
 
     stub:
     """
-    findMotifs.pl ${positve_set} fasta tmp -fasta ${negative_set} -len ${filter_len} -norevopp -mcheck ${jaspar_db} -mknown ${jaspar_db}
+    # print versions
+    perl -X --version | grep 'This is perl'
+    echo homer version (10-24-2019)
+
+    # create the expected dirs and outputs
+    mkdir -p tmp/homerResults
     """
 }

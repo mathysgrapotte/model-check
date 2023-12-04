@@ -17,11 +17,16 @@ process HOMER_FIND_MOTIF {
 
     script:
     """
-    echo bubba
+    findMotifs.pl ${positve_set} fasta tmp -fasta ${negative_set} -len ${filter_len}
     """
 
     stub:
     """
-    findMotifs.pl ${positve_set} fasta tmp -fasta ${negative_set} -len ${filter_len}
+    # print versions 
+    perl -X --version | grep 'This is perl'
+    echo homer version (10-24-2019)
+
+    # create the expected dirs and outputs
+    mkdir -p tmp/homerResults
     """
 }
