@@ -184,7 +184,6 @@ class GenerateSingleFixedMotifDataset(GenerateFasta):
         self.motif_tag = motif_tag
         self.non_motif_tag = non_motif_tag
         self.number_of_sequences = number_of_sequences
-        self.generate_dataset()
 
     def generate_dataset(self):
         """ This function generates the dataset. """
