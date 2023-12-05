@@ -3,7 +3,7 @@ process CONVOLUTION_SCAN {
 
     container 'alessiovignoli3/model-check:dataload_training'
     label 'process_low'
-    tag "${}"
+    tag "${fasta}"
 
     input:
     path fasta
@@ -17,7 +17,7 @@ process CONVOLUTION_SCAN {
 
     script:
     """
-    launch_convolution_scan.py -i ${fasta} -hp ${hyperparameter} -p ${parameter} -o PLACEHOLDER_
+    launch_convolution_scan.py -i ${fasta} -hp ${hyperparameter} -p ${parameter} -o PLACEHOLDER
     """
 
     stub:

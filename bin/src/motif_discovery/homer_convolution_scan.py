@@ -69,7 +69,7 @@ class MnnHomerForegroundBackgroundSetup(HomerForegroundBackgroundSetup):
         self.model.eval()
 
         # get the filter size for the given module
-        filter_size = self.model.get_filter_size_for_module(module_id)
+        self.filter_size = self.model.get_filter_size_for_module(module_id)
 
         # for each sequence in the input fasta
         for batch_idx, (data, target, name) in enumerate(self.input_fasta_data_loader):
@@ -93,8 +93,8 @@ class MnnHomerForegroundBackgroundSetup(HomerForegroundBackgroundSetup):
 
                 
                 # get the sequence from the input fasta
-                sequence = self.input_fasta.sequences[batch_idx][i:i+filter_size]
-                name_sequence = name[0] + "_" + str(i) + "_" + str(i+filter_size)
+                sequence = self.input_fasta.sequences[batch_idx][i:i+self.filter_size]
+                name_sequence = name[0] + "_" + str(i) + "_" + str(i+self.filter_size)
 
                 # if the output is positive
                 if output[i] > 0:
@@ -118,12 +118,11 @@ class MnnHomerForegroundBackgroundSetup(HomerForegroundBackgroundSetup):
         self.scan_sequences('last')
 
         # write the fastas
-        self.write_fastas(path_to_folder, "module_last.fasta")
+        self.write_fastas(path_to_folder, "module_last_" + str(self.filter_size) + ".fasta")
 
         # reset the fastas
         self.positive_hit_fasta = Fasta()
         self.negative_hit_fasta = Fasta()
-        
 
         # for each module
         for i in range(len(self.model.blocks)):
@@ -131,7 +130,7 @@ class MnnHomerForegroundBackgroundSetup(HomerForegroundBackgroundSetup):
             self.scan_sequences(i)
 
             # write the fastas
-            self.write_fastas(path_to_folder, "module_" + str(i) + ".fasta")
+            self.write_fastas(path_to_folder, "module_" + str(i) + "_" + str(self.filter_size) + ".fasta")
 
             # reset the fastas
             self.positive_hit_fasta = Fasta()
