@@ -67,8 +67,8 @@ def main(motif, jaspar, out_name, base_fasta, seq_len, motif_tag, non_motif_tag,
 		
 		# If there are more than one id then the multi version of the class is called
 		if len(motif_id) == 1:
-			dataset = GenerateSingleFixedMotifDataset(seq_len, motif_id[0], motif_tag, non_motif_tag, num_seq, motif_start)
-			dataset.generate_dataset()  #base_fasta)
+			dataset = GenerateSingleFixedMotifDataset(seq_len, motif_id[0])
+			dataset.generate_dataset(motif_tag, non_motif_tag, num_seq, motif_start, base_fasta)
 		else:
 			# TODO Put here your multi class using jaspar
 			raise SystemError('not implemented the multi class using jaspar ids')
