@@ -177,27 +177,41 @@ class GenerateFasta(Fasta):
 class GenerateSingleFixedMotifDataset(GenerateFasta):
     """ This class generates a simple balanced dataset with a single fixed motif being present in some sequences. Said sequences are associated a positive label where the non motif sequences are associated a negative label. """
     
-    def __init__(self, dna_sequence_length, motif, motif_tag, non_motif_tag, number_of_sequences=1000, motif_start=None):
+
+    def __init__(self, dna_sequence_length, motif):
         super().__init__(dna_sequence_length)
         self.motif = motif
-        self.motif_start = motif_start
-        self.motif_tag = motif_tag
-        self.non_motif_tag = non_motif_tag
-        self.number_of_sequences = number_of_sequences
 
-    def generate_dataset(self):
-        """ This function generates the dataset. """
-        for i in range(self.number_of_sequences):
-            sequence = self.generate_random_dna_sequence()
-            sequence = self.insert_motif_in_sequence(sequence, self.motif, self.motif_start)
-            self.sequences.append(sequence)
-            self.sequence_names.append(f"sequence_{i}")
-            self.tags.append(self.motif_tag)
-        for i in range(self.number_of_sequences):
-            sequence = self.generate_random_dna_sequence()
-            self.sequences.append(sequence)
-            self.sequence_names.append(f"sequence_{i + self.number_of_sequences}")
-            self.tags.append(self.non_motif_tag)
+    def generate_dataset(self, motif_tag, non_motif_tag, number_of_sequences, motif_start=None, path_fasta=None):
+        """ This function generates the dataset. 
+            It also needs the scores to associate to positive and negative set since it lacks the means to do so.
+            This is achieved with the flags -> motif_tag, non_motif_tag,
+        """
+
+        # if the path to fasta is specified, load the fasta file and enrich it with the motif
+        if path_fasta:
+            self.load_fasta(path_fasta)
+            # check if the sequences are of the right length, throw an error if not since it is not going to fit the model, in the error message, also specify the length of the sequences in the fasta file and the user input
+            assert len(self.sequences[0]) == self.dna_sequence_length, f"The sequences in the fasta file are of length {len(self.sequences[0])} while the user input dna_sequence_length is {self.dna_sequence_length}"
+            # update the number_of_sequences variable
+            number_of_sequences = len(self.sequences)
+            # set the tag list to non_motif_tag for later update 
+            self.tags = [non_motif_tag for _ in range(number_of_sequences) ]
+
+        # otherwise generate number_of_sequences sequences randomly with their names
+        else:
+            for i in range(number_of_sequences):
+                sequence = self.generate_random_dna_sequence()
+                sequence_name = f"sequence_{i}"
+                self.sequences.append(sequence)
+                self.sequence_names.append(sequence_name)
+                self.tags.append(non_motif_tag)
+
+        # Then for half of the sequences, enrich with the given motif and update the tag value with motif_tag
+        for i in range(number_of_sequences // 2 ):
+            self.sequences[i] = self.insert_motif_in_sequence(self.sequences[i], self.motif, motif_start)
+            self.tags[i] = motif_tag
+
 
 class GenerateSingleJasparMotifDataset(GenerateFasta):
     """ This class generate a Dataset with a single motif from the jaspar database. """
@@ -207,16 +221,13 @@ class GenerateSingleJasparMotifDataset(GenerateFasta):
         self.jaspar_motif = self.get_motif_from_jaspar(jaspar_motif_id)
 
     def generate_dataset(self, number_of_sequences, motif_start=None, path_fasta=None):
-        # if the path to fasta is specified, load the fasta file
+        # if the path to fasta is specified, load the fasta file and enrich it with the motif
         if path_fasta:
             self.load_fasta(path_fasta)
-
             # check if the sequences are of the right length, throw an error if not since it is not going to fit the model, in the error message, also specify the length of the sequences in the fasta file and the user input
             assert len(self.sequences[0]) == self.dna_sequence_length, f"The sequences in the fasta file are of length {len(self.sequences[0])} while the user input dna_sequence_length is {self.dna_sequence_length}"
-
             # update the number_of_sequences variable
             number_of_sequences = len(self.sequences)
-
             # reset the tag list to empty for generation
             self.tags = []
 
