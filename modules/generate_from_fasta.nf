@@ -3,14 +3,14 @@ process GENERATE_FROM_FASTA {
 
     container "alessiovignoli3/model-check:generate_fasta"
     label "process_low"
+    tag "${motif_file}"
 
     input:
-    path motif_file
-    path base_fasta
+    tuple val(dir_ID), path(motif_file), path(base_fasta)
     val type_of_file_flag
 
     output:
-    path "*", emit: dna_fasta
+    path "${dir_ID}", emit: dna_dir, type: 'dir'
     stdout emit: standardout
 
     script:
@@ -18,6 +18,8 @@ process GENERATE_FROM_FASTA {
     def prefix = task.ext.prefix ?: "generated.fasta"
     """
     launch_fasta_generate.py ${type_of_file_flag} ${motif_file} -o ${prefix} -f ${base_fasta} ${args}
+    mkdir ${dir_ID}
+    mv  ${prefix}  ${dir_ID}
     """
 
     stub:
@@ -25,6 +27,8 @@ process GENERATE_FROM_FASTA {
     def prefix = task.ext.prefix ?: "generated.fasta"
     """
     launch_fasta_generate.py ${type_of_file_flag} ${motif_file} -o ${prefix} -f ${base_fasta} ${args} --modules_version True
+    mkdir ${dir_ID}
+    mv  ${prefix}  ${dir_ID}
     """
 
 }
