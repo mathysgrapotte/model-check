@@ -6,10 +6,10 @@ process  JASPAR_TO_HOMER {
     tag "${jaspar_pwm_file}"
 
     input:
-    path jaspar_pwm_file
+    tuple val(line_ID), path(jaspar_pwm_file)
 
     output:
-    path "${out_name}", emit: homer_matrix
+    tuple val(line_ID), path("${out_name}"), emit: homer_matrix
     stdout emit: standardout
 
     script:

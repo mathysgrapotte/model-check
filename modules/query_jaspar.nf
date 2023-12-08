@@ -9,7 +9,7 @@ process QUERY_JASPAR {
     tuple val(line_ID), val(jaspar_motif_id)
 
     output:
-    path "*.jaspar", emit: jaspar_pwm, optional: true
+    tuple val(line_ID), path("*.jaspar"), emit: jaspar_pwm, optional: true
     stdout emit: standardout
 
     script:

@@ -49,9 +49,9 @@ workflow JASPAR_DOWNLOAD {
         
         // transform jaspar output into homer readable one
         JASPAR_TO_HOMER( jaspar_pwm )
-        db                   = JASPAR_TO_HOMER.out.homer_matrix
+        db                   =  JASPAR_TO_HOMER.out.homer_matrix
         JASPAR_TO_HOMER.out.standardout.first().view()
-        
+    
     }
 
 
