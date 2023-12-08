@@ -10,7 +10,7 @@ process GENERATE_FASTA {
     val type_of_file_flag
 
     output:
-    path "${dir_ID}", emit: dna_dir, type: 'dir'
+    tuple val(dir_ID), path("${dir_ID}", type: 'dir'), emit: dna_dir
     stdout emit: standardout  
 
     script:

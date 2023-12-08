@@ -35,14 +35,14 @@ workflow JASPAR_DOWNLOAD {
                                                it
                                                     -> [ ( it.baseName.split('\\.')[0..-2].join("_") + "_line" + it.baseName.split('\\.')[-1]  ),
                                                         it] }
-        // this line now splits the files of already one line to get to a list of motifs etting rid of missing fields and empty lines
+        // this line now splits the files of already one line to get to a list of motifs getting rid of missing fields and empty lines
         motif_line           = tmp_line_file.splitCsv( elem: 1, strip: true ).map{ 
                                                it 
                                                     -> [ it[0], (it[1] - '') ] }.filter{ it[1] != [] }.map{
                                                it
                                                     -> [ it[0], it[1].join(" ")] }
 
-        
+
         QUERY_JASPAR( motif_line )
         jaspar_pwm           = QUERY_JASPAR.out.jaspar_pwm
         completition_message = QUERY_JASPAR.out.standardout.filter{ it != '' }

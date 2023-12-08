@@ -6,7 +6,7 @@ process ONE_STEP_TRAIN {
     tag "${fasta}"
 
     input:
-    path fasta
+    tuple val(dir_ID), path(fasta)
 
     output:
     stdout emit: standardout
