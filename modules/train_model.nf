@@ -1,17 +1,18 @@
 
 process TRAIN_MODEL {
 
+    publishDir path: "${params.outdir}/${dir_ID}", mode: "${params.publish_dir_mode}", overwrite: true
     container 'alessiovignoli3/model-check:dataload_training'
     label 'process_medium_high'
     tag "${fasta}"
 
     input:
-    path fasta
+    tuple val(dir_ID), path(fasta)
 
     output:
-    path "*.pt", emit: best_model
-    path "train_statistics.txt", emit: statistics
-    path "architecture.txt", emit: architecture
+    tuple val(dir_ID), path("*.pt"), emit: best_model
+    tuple val(dir_ID), path("train_statistics.txt"), emit: statistics
+    tuple val(dir_ID), path("architecture.txt"), emit: architecture
     stdout emit: standardout
 
     script:

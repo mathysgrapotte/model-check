@@ -31,7 +31,7 @@ workflow VERIFY_TRAINED {
     completition_message = ''
     
     if ( params.skip_homer || params.input_fasta ) {
-        //completition_message = '\n# skipped homer for verifying motif learnt by model\n'
+        completition_message = '\n# skipped homer for verifying motif learnt by model\n'
 
     } else {
         CONVOLUTION_SCAN( input_fasta, model_architecture, trained_model )

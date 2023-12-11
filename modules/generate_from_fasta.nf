@@ -10,12 +10,12 @@ process GENERATE_FROM_FASTA {
     val type_of_file_flag
 
     output:
-    tuple val(dir_ID), path("${dir_ID}",  type: 'dir'), emit: dna_dir
+    tuple val(dir_ID), path("${dir_ID}/${prefix}"), emit: dna_dir
     stdout emit: standardout
 
     script:
     def args = task.ext.args ?: ""
-    def prefix = task.ext.prefix ?: "generated.fasta"
+    prefix = task.ext.prefix ? task.ext.prefix : "generated.fasta"
     """
     launch_fasta_generate.py ${type_of_file_flag} ${motif_file} -o ${prefix} -f ${base_fasta} ${args}
     mkdir ${dir_ID}
@@ -24,7 +24,7 @@ process GENERATE_FROM_FASTA {
 
     stub:
     def args = task.ext.args ?: ""
-    def prefix = task.ext.prefix ?: "generated.fasta"
+    prefix = task.ext.prefix ? task.ext.prefix : "generated.fasta"
     """
     launch_fasta_generate.py ${type_of_file_flag} ${motif_file} -o ${prefix} -f ${base_fasta} ${args} --modules_version True
     mkdir ${dir_ID}
