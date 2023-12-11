@@ -3,7 +3,7 @@ process GENERATE_FROM_FASTA {
 
     container "alessiovignoli3/model-check:generate_fasta"
     label "process_low"
-    tag "${motif_file}"
+    tag "${dir_ID}"
 
     input:
     tuple val(dir_ID), path(motif_file), path(base_fasta)

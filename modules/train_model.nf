@@ -4,7 +4,7 @@ process TRAIN_MODEL {
     publishDir path: "${params.outdir}/${dir_ID}", mode: "${params.publish_dir_mode}", overwrite: true
     container 'alessiovignoli3/model-check:dataload_training'
     label 'process_medium_high'
-    tag "${fasta}"
+    tag "${dir_ID}"
 
     input:
     tuple val(dir_ID), path(fasta)

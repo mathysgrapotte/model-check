@@ -6,10 +6,10 @@ process HOMER_FIND_MOTIF {
         'https://depot.galaxyproject.org/singularity/homer:4.11--pl526hc9558a2_3' :
         'biocontainers/homer:4.11--pl526hc9558a2_3' }"                                                   // homer 4.11 and perl 5.26.2
     label "process_medium"
-    tag "${id}"
+    tag "${dir_ID}-${filter_num}"
 
     input:
-    tuple val(id), val(filter_len), path(positve_set), path(negative_set)
+    tuple val(dir_ID), val(filter_num), val(filter_len), path(positve_set), path(negative_set)
 
     output:
     //path( "*positive*.fasta" ), emit: positve_set
