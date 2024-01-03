@@ -8,6 +8,7 @@ process TRAIN_MODEL {
 
     input:
     tuple val(dir_ID), path(fasta)
+    val passed_check                         // used just to enforce dependency from the check train step
 
     output:
     tuple val(dir_ID), path("*.pt"), emit: best_model
