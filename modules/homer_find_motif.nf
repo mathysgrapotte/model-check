@@ -5,6 +5,7 @@ process HOMER_FIND_MOTIF {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/homer:4.11--pl526hc9558a2_3' :
         'quay.io/biocontainers/homer:4.11--pl526hc9558a2_3' }"                                                   // homer 4.11 and perl 5.26.2
+    publishDir path: "${params.outdir}/${dir_ID}/filter_${filter_num}", mode: "${params.publish_dir_mode}", overwrite: true
     label "process_medium"
     tag "${dir_ID}-${filter_num}"
 
@@ -12,12 +13,12 @@ process HOMER_FIND_MOTIF {
     tuple val(dir_ID), val(filter_num), val(filter_len), path(positve_set), path(negative_set)
 
     output:
-    //path( "*positive*.fasta" ), emit: positve_set
+    path( "homerResults" ), type: 'dir', emit: positve_set
     stdout emit: standardout
 
     script:
     """
-    findMotifs.pl ${positve_set} fasta tmp -fasta ${negative_set} -len ${filter_len}
+    findMotifs.pl ${positve_set} fasta . -fasta ${negative_set} -len ${filter_len}
     """
 
     stub:
@@ -27,6 +28,6 @@ process HOMER_FIND_MOTIF {
     echo homer version (10-24-2019)
 
     # create the expected dirs and outputs
-    mkdir -p tmp/homerResults
+    mkdir -p homerResults
     """
 }
