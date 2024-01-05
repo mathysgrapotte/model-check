@@ -4,7 +4,7 @@ process HOMER_FIND_MOTIF {
     // the following is to handle both singularity and docker while using a biocontainer
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/homer:4.11--pl526hc9558a2_3' :
-        'biocontainers/homer:4.11--pl526hc9558a2_3' }"                                                   // homer 4.11 and perl 5.26.2
+        'quay.io/biocontainers/homer:4.11--pl526hc9558a2_3' }"                                                   // homer 4.11 and perl 5.26.2
     label "process_medium"
     tag "${dir_ID}-${filter_num}"
 
