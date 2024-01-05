@@ -1,12 +1,13 @@
 
 process PLOT_MODEL_WEIGHTS {
 
+    publishDir path: "${params.outdir}/${dir_ID}", mode: "${params.publish_dir_mode}", overwrite: true
     container 'alessiovignoli3/model-check:dataload_training'
     label 'process_low'
+    tag "${dir_ID}"
 
     input:
-    path architecture
-    path best_model
+    tuple val(dir_ID), path(architecture), path(best_model)
 
     output:
     path "*.png", emit: weights_plots  
@@ -14,7 +15,7 @@ process PLOT_MODEL_WEIGHTS {
 
     script:
     """
-    launch_plot_model_weights.py -hp ${architecture} -p ${best_model} -o ''
+    launch_plot_model_weights.py -hp ${architecture} -p ${best_model} -o ${dir_ID}
     """
 
     stub:
