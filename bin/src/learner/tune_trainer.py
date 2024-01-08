@@ -6,6 +6,7 @@ from ray.air import session
 from ray.air.checkpoint import Checkpoint
 from ray.tune.schedulers import ASHAScheduler
 from scipy.stats import spearmanr
+import copy
 import numpy as np
 import torch
 import torch.optim as optim
@@ -130,24 +131,25 @@ class MnnTrainer(Trainer):
 
         @return: None
         """
-        # check if self.model exists, if it does not, initialize it, if it does, add a block of the relevant size
+        # check if self.model exists, if it does not, initialize a mirror model, if it does, initialize a mirror model and add a block of the relevant size
         if not hasattr(self, 'model'):
-            self.model = Net(config['filter_size'], size=self.size)
+            net = Net(config['filter_size'], size=self.size)
         else:
-            self.model.add_block(config['filter_size'])
+            net = copy.deepcopy(self.model)
+            net.add_block(config['filter_size'])
 
         # intialize Adam optimizer with learning rate from config
-        optimizer = optim.Adam(self.model.parameters(), lr=config['learning_rate'])
+        optimizer = optim.Adam(net.parameters(), lr=config['learning_rate'])
 
         # train model for self.epochs epochs
         for epoch in range(self.epochs):
-            self.train(self.model, optimizer)
+            self.train(net, optimizer)
 
             # get test loss and accuracy
-            test_loss, accuracy = self.test_regression(self.model)
+            test_loss, accuracy = self.test_regression(net)
 
             # report test loss and accuracy to session
-            checkpoint = Checkpoint.from_dict({"epoch":epoch, "model_state_dict": self.model.state_dict()})
+            checkpoint = Checkpoint.from_dict({"epoch":epoch, "model_state_dict": net.state_dict()})
             session.report({"accuracy": accuracy, "loss": test_loss}, checkpoint=checkpoint)
 
     def tune(self, search_space, num_samples=25, patience=5, threshold=0.05):
