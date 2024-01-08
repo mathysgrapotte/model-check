@@ -3,10 +3,10 @@ process ONE_STEP_TRAIN {
 
     container 'alessiovignoli3/model-check:dataload_training'
     label 'process_low'
-    tag "${fasta}"
+    tag "${dir_ID}"
 
     input:
-    path fasta
+    tuple val(dir_ID), path(fasta)
 
     output:
     stdout emit: standardout

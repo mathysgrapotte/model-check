@@ -27,19 +27,31 @@ workflow JASPAR_DOWNLOAD {
 
     } else {
 
-        // get to motif id level, because that is what is going to be downloaded
+        // get to motif file line level, because that is what is going to be downloaded, (each motif ID per line)
+        // then appended to the same file all the motifs in the same line in the original motif file in the process
         jaspar_id_file       = Channel.fromPath( params.jaspar )
-        motif_id             = jaspar_id_file.splitCsv( strip: true ).flatten().filter{ it != '' }
+ 	// this line gets filename and line num correctly making it the ID
+        tmp_line_file        = jaspar_id_file.splitText( file: true ).map{
+                                               it
+                                                    -> [ ( it.baseName.split('\\.')[0..-2].join("_") + "_line" + it.baseName.split('\\.')[-1]  ),
+                                                        it] }
+        // this line now splits the files of already one line to get to a list of motifs getting rid of missing fields and empty lines
+        motif_line           = tmp_line_file.splitCsv( elem: 1, strip: true ).map{ 
+                                               it 
+                                                    -> [ it[0], (it[1] - '') ] }.filter{ it[1] != [] }.map{
+                                               it
+                                                    -> [ it[0], it[1].join(" ")] }
 
-        QUERY_JASPAR( motif_id )
+
+        QUERY_JASPAR( motif_line )
         jaspar_pwm           = QUERY_JASPAR.out.jaspar_pwm
         completition_message = QUERY_JASPAR.out.standardout.filter{ it != '' }
-
-        // transform jaspaer output into homer readable one
+        
+        // transform jaspar output into homer readable one
         JASPAR_TO_HOMER( jaspar_pwm )
-        db                   = JASPAR_TO_HOMER.out.homer_matrix
+        db                   =  JASPAR_TO_HOMER.out.homer_matrix
         JASPAR_TO_HOMER.out.standardout.first().view()
-
+    
     }
 
 

@@ -21,7 +21,7 @@ def get_args():
     parser.add_argument("-i", "--infasta", type=str, required=True, metavar="FILE", help='The file path for the DNA sequences in fasta format.')
     parser.add_argument("-hp", "--hyper_params", type=str, required=True, metavar="FILE", help='The file path for the hyper parameters of the model.')
     parser.add_argument("-p", "--params", type=str, required=True, metavar="FILE", help='The file path for the parameters of the model.')
-    parser.add_argument("-o", "--output", type=str, required=False, metavar="FILE", default="output/", help='The file path for the output folder.')
+    parser.add_argument("-o", "--output", type=str, required=False, nargs='?', const='', default='', metavar="FILE", help='The file path for the output folder. Or better the string to be placed in front the standard filename, so if it contains a slash is treated as dir otherwise as simple prefix.')
     parser.add_argument("--modules_version", type=str, required=False, nargs='?', const='False', default='False', metavar='VERBOSE', help='auxiliary flag top check module version used byt this script.')
     args = parser.parse_args()
     return args

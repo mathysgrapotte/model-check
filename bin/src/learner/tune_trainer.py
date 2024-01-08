@@ -57,7 +57,7 @@ class Trainer(ABC):
             output = model(data)
 
             # reshape output to match target shape
-            output = output.view(target.shape[0], -1)
+            output = output.view(target.shape[0])
             loss = self.loss_function(output, target)
             loss.backward()
             optimizer.step()

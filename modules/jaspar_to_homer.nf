@@ -3,13 +3,13 @@ process  JASPAR_TO_HOMER {
 
     container "alessiovignoli3/model-check:pwm2homer" 
     label 'process_low'
-    tag "${jaspar_pwm_file}"
+    tag "${dir_ID}"
 
     input:
-    path jaspar_pwm_file
+    tuple val(dir_ID), path(jaspar_pwm_file)
 
     output:
-    path "${out_name}", emit: homer_matrix
+    tuple val(dir_ID), path("${out_name}"), emit: homer_matrix
     stdout emit: standardout
 
     script:
