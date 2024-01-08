@@ -96,9 +96,10 @@ if (params.help) {
     log.info "                         Default 2,20. Meaning value between 2,20 are tested.\n"
     log.info "--optimizer_lr           The linear rate value of the optimizer. Default 1e-4,o.o1."
     log.info "                         The learning rate during training is it taken from this range."
-    log.info "                         In tecnical terms means doing the tune.loguniform between those two values."
-    log.info ""
-    log.info ""
+    log.info "                         In tecnical terms means doing the tune.loguniform between those two values.\n"
+    log.info "--number_sample          The number of model training in parallel for each 'step' of the Hyperparameter search."
+    log.info "                         The higher the number, the more exaustive is the search in the Hyperparameter space. "
+    log.info "                         Default 15. In tecnical terms is the Ray tune.Tuner tune_config num_samples variable."
     exit 1
 }
 
