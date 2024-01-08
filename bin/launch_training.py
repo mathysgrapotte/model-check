@@ -26,14 +26,15 @@ def get_args():
 	parser.add_argument("-e", "--epochs", type=int, required=False, nargs='?', const=10, default=10, metavar="EPOCH", help='The number of epochs for which the model have to be trained. Default 10.') 
 	parser.add_argument("-fs", "--filter_size", type=str, required=False, nargs='?', const='2,20', default='2,20', metavar="RANGE", help='The convolution filter size to be tested. Default 2,20. Meaning value between 2,20 are tested.' ) 
 	parser.add_argument("-olr", "--optimizer_lr", type=str, required=False, nargs='?', const='1e-4,0.01', default='1e-4,0.01', metavar="RANGE", help='The linear  rate value of the optimizer. Default 1e-4,o.o1. Meaning doing the tune.loguniform between those two values.')
-	
+	parser.add_argument("-ns", "--number_sample", type=int, required=False, nargs='?', const=15, default=15, metavar="EXPERIMENTS", help='The Ray tune.Tuner tune_config num_samples variable. Meaning the number of model training in parallel for each "step" of the Hyperparameter search. Default 15.')
+
 	parser.add_argument("--modules_version", type=str, required=False, nargs='?', const='False', default='False', metavar='VERBOSE', help='auxiliary flag top check module version used byt this script.')
 
 	args = parser.parse_args()
 	return args
 
 
-def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, modules_version='False'):
+def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, number_sample, modules_version='False'):
 
 	if eval(modules_version):
 		print('python :', sys.version, '\n',  'numpy :', np.__version__ , '\n', 'torch :', torch.__version__, '\n', 'ray :', ray.__version__)
@@ -56,7 +57,7 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
               'batch_size':tune.choice( batch_ranges )}
 
 	# run a tune run
-	dfs = mnn_trainer.tune(search_space=config, num_samples=15)
+	dfs = mnn_trainer.tune(search_space=config, num_samples=number_sample)
 	best_result = dfs.get_best_result(metric='accuracy', mode='max')
 	checkpoint = best_result.checkpoint.to_dict()
 
@@ -75,4 +76,5 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
 if __name__ == "__main__":
 	args = get_args()
 
-	main(args.infasta, args.batch_size, args.shuffle, args.seq_len, args.epochs, args.filter_size, args.optimizer_lr, args.modules_version)
+	main(args.infasta, args.batch_size, args.shuffle, args.seq_len, args.epochs, args.filter_size, \
+            args.optimizer_lr, args.number_sample, args.modules_version)

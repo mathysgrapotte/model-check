@@ -5,7 +5,13 @@ process HOMER_FIND_MOTIF {
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/homer:4.11--pl526hc9558a2_3' :
         'quay.io/biocontainers/homer:4.11--pl526hc9558a2_3' }"                                                   // homer 4.11 and perl 5.26.2
-    publishDir path: "${params.outdir}/${dir_ID}/filter_${filter_num}", mode: "${params.publish_dir_mode}", overwrite: true
+    
+    // the outdir has to be the one the user specify plus stuff that makes it run unique
+    publishDir (
+        path: ( "${params.outdir}/${workflow.runName}_" + "${workflow.start}".replaceAll('[-:]', '_').split('\\.')[0] +  "/${dir_ID}/filter_${filter_num}"),
+        mode: "${params.publish_dir_mode}",
+        overwrite: true 
+    )
     label "process_medium"
     tag "${dir_ID}-${filter_num}"
 

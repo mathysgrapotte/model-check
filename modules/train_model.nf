@@ -1,7 +1,12 @@
 
 process TRAIN_MODEL {
 
-    publishDir path: "${params.outdir}/${dir_ID}", mode: "${params.publish_dir_mode}", overwrite: true
+    // the outdir has to be the one the user specify plus stuff that makes it run unique
+    publishDir (
+        path: "${params.outdir}/${workflow.runName}_" + "${workflow.start}".replaceAll('[-:]', '_').split('\\.')[0] +  "/${dir_ID}",
+        mode: "${params.publish_dir_mode}", 
+        overwrite: true 
+    )
     container 'alessiovignoli3/model-check:dataload_training'
     label 'process_medium_high'
     tag "${dir_ID}"
