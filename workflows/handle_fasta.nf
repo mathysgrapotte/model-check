@@ -24,7 +24,7 @@ workflow HANDLE_FASTA {
     // in case is missing an empty channel is created instead to comply with the input declaration of the GENERATE_FASTA process
     base_fasta = ''
     if ( params.generate_from_fasta  ) {
-        base_fasta =  Channel.fromPath( params.generate_from_fasta )
+        base_fasta =  Channel.fromPath( params.generate_from_fasta ).map{ it -> [ it.baseName, it ]}
     }
 
 
@@ -62,7 +62,9 @@ workflow HANDLE_FASTA {
 	if ( params.generate_from_fasta ) {
                 
                 // to make the next process execute the correct number of times base_fasta has to be adde to the tuple created above
-                input_files = jaspar_id_file.combine( base_fasta )
+                tmp_input_files = jaspar_id_file.combine( base_fasta )
+                // and the filename of the base fasta added to the ID value
+                input_files     = tmp_input_files.map{ it -> [ (it[0] + '_' + it[2]), it[1], it[3] ]}
 
                 GENERATE_FROM_FASTA( input_files, '-j' )
                 fasta = GENERATE_FROM_FASTA.out.dna_dir
@@ -91,7 +93,8 @@ workflow HANDLE_FASTA {
 
 	if ( params.generate_from_fasta ) {
 
-                input_files = motif_file.combine( base_fasta )
+                tmp_input_files = motif_file.combine( base_fasta )
+                input_files     = tmp_input_files.map{ it -> [ (it[0] + '_' + it[2]), it[1], it[3] ]}
 
 		GENERATE_FROM_FASTA( input_files, '-m' )
                 fasta = GENERATE_FROM_FASTA.out.dna_dir

@@ -73,7 +73,7 @@ workflow VERIFY_TRAINED {
 
 	} else {
 		HOMER_FIND_MOTIF( paired_sets )
-		completition_message.concat( HOMER_FIND_MOTIF.out.standardout ).view()
+		completition_message.concat( HOMER_FIND_MOTIF.out.standardout )
 	}
         
     }
