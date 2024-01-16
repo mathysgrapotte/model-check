@@ -34,20 +34,38 @@ def get_args():
 	return args
 
 
-def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, number_sample, modules_version='False'):
+def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, number_sample, modules_version='False', with_seed=True):
+
+	if with_seed:
+		# set the seed for reproducibility
+		seed = 42
+		torch.manual_seed(seed)
+		torch.cuda.manual_seed(seed)
+		torch.cuda.manual_seed_all(seed)
+		torch.backends.cudnn.deterministic = True
+		torch.backends.cudnn.benchmark = False
+		np.random.seed(seed)
+		np.random.RandomState(seed)
 
 	if eval(modules_version):
 		print('python :', sys.version, '\n',  'numpy :', np.__version__ , '\n', 'torch :', torch.__version__, '\n', 'ray :', ray.__version__)
 
 	# load the fasta file using the pytorch fasta loader
 	pytorch_loader = fastaDataset(data)
-	train_set = DataLoader(pytorch_loader, batch_size=int(Batch_size.split(',')[1]), shuffle=Shuffle)
+
+	# split the pytorch loader dataset in train, test and validation set following a 80/10/10 ratio
+	train_set, test_set, val_set = torch.utils.data.random_split(pytorch_loader, [0.8, 0.1, 0.1])
+
+	# load train_set, test_set, and val_set in dataloaders
+	train_loader = DataLoader(train_set, batch_size=int(Batch_size.split(',')[1]), shuffle=Shuffle)
+	test_loader = DataLoader(test_set, batch_size=int(Batch_size.split(',')[1]), shuffle=Shuffle)
+	val_loader = DataLoader(val_set, batch_size=int(Batch_size.split(',')[1]), shuffle=Shuffle)
 	
 	# define the loss function
 	loss_function = nn.MSELoss()
 
 	# initiate the tune trainer
-	mnn_trainer = MnnTrainer(train_loader=train_set, test_loader=train_set, loss_function=loss_function, epochs=Epochs, size=seq_len)
+	mnn_trainer = MnnTrainer(train_loader=train_loader, val_loader=val_loader, loss_function=loss_function, epochs=Epochs, size=seq_len)
 
 	# Creating the search space
 	step = ( int(Batch_size.split(',')[1]) - int(Batch_size.split(',')[0]) ) / 9
@@ -61,6 +79,11 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
 	best_result = dfs.get_best_result(metric='accuracy', mode='max')
 	checkpoint = best_result.checkpoint.to_dict()
 
+	# apply mnn_trainer.model on the left out test_set and get the accuracy
+	test_loss, accuracy = mnn_trainer.test_regression(mnn_trainer.model, test_loader)
+	
+
+
 	# save the best model and model architecture
 	torch.save(mnn_trainer.model.state_dict(), 'best_model.pt')
 	with open("architecture.txt", 'w') as arch_out:
@@ -71,6 +94,8 @@ def main(data, Batch_size, Shuffle, seq_len, Epochs, filter_size, optimizer_lr, 
 	print(best_result.metrics)
 	print("printing model")
 	print(mnn_trainer.model)
+	print("---------------------")
+	print("accuracy on the test set: ", accuracy)
 
 
 if __name__ == "__main__":
