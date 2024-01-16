@@ -21,10 +21,10 @@ class Trainer(ABC):
     master class for hyper parameter optimisation for all pytorch models
     """
 
-    def __init__(self, train_loader, test_loader, loss_function, eval_regression = spearmanr) -> None:
+    def __init__(self, train_loader, val_loader, loss_function, eval_regression = spearmanr) -> None:
         super().__init__()
         self.train_loader = train_loader
-        self.test_loader = test_loader
+        self.val_loader = val_loader
         self.loss_function = loss_function
         self.eval_regression = eval_regression
 
@@ -63,7 +63,7 @@ class Trainer(ABC):
             loss.backward()
             optimizer.step()
 
-    def test_regression(self, model):
+    def test_regression(self, model, data_loader):
         """
         performs one epoch of testing
 
@@ -86,7 +86,7 @@ class Trainer(ABC):
 
         # no gradient calculation
         with torch.no_grad():
-            for batch_idx, (data, target, _) in enumerate(self.test_loader):
+            for batch_idx, (data, target, _) in enumerate(data_loader):
                 # send target to targets list (convert to list first)
                 targets += target.view(-1).tolist()
 
@@ -106,7 +106,7 @@ class Trainer(ABC):
                 test_loss += self.loss_function(output, target).item()
 
         # average loss
-        test_loss /= len(self.test_loader.dataset)
+        test_loss /= len(data_loader.dataset)
 
         # calculate accuracy
         accuracy = self.eval_regression(np.array(targets), np.array(predictions))[0]
@@ -118,8 +118,8 @@ class MnnTrainer(Trainer):
     class for using raytune to tune hyperparameters for mnn models
     """
 
-    def __init__(self, train_loader, test_loader, loss_function, epochs=10, size=101, eval_regression=spearmanr) -> None:
-        super().__init__(train_loader, test_loader, loss_function, eval_regression)
+    def __init__(self, train_loader, val_loader, loss_function, epochs=10, size=101, eval_regression=spearmanr) -> None:
+        super().__init__(train_loader, val_loader, loss_function, eval_regression)
         self.size = size
         self.epochs = epochs
 
@@ -146,7 +146,7 @@ class MnnTrainer(Trainer):
             self.train(net, optimizer)
 
             # get test loss and accuracy
-            test_loss, accuracy = self.test_regression(net)
+            test_loss, accuracy = self.test_regression(net, self.val_loader)
 
             # report test loss and accuracy to session
             checkpoint = Checkpoint.from_dict({"epoch":epoch, "model_state_dict": net.state_dict()})
