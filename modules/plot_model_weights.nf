@@ -12,18 +12,26 @@ process PLOT_MODEL_WEIGHTS {
     tag "${dir_ID}"
 
     input:
-    tuple val(dir_ID), path(architecture), path(best_model)
+    tuple val(motif_line_ID), val(fasta_ID), path(architecture), path(best_model)
 
     output:
     path "*.png", emit: weights_plots  
     stdout emit: standardout
 
     script:
+    dir_ID   = motif_line_ID
+    if ( fasta_ID != '') {
+        dir_ID = motif_line_ID + "_" + fasta_ID
+    }
     """
     launch_plot_model_weights.py -hp ${architecture} -p ${best_model} -o ${dir_ID}
     """
 
     stub:
+    dir_ID   = motif_line_ID
+    if ( fasta_ID != '') {
+        dir_ID = motif_line_ID + "_" + fasta_ID
+    }
     """
     #!/usr/bin/env python3
      

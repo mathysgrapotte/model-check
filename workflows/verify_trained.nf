@@ -36,29 +36,34 @@ workflow VERIFY_TRAINED {
     } else {
 
         // pair together the right elements of each channel
-        model          = model_architecture.combine( trained_model, by: 0 )
-        matched_imputs = input_fasta.combine( model, by: 0 )
+        model          = model_architecture.combine( trained_model, by: [0,1] )
+        matched_imputs = input_fasta.combine( model, by: [0,1] )
 
 
         CONVOLUTION_SCAN( matched_imputs )
         completition_message = CONVOLUTION_SCAN.out.standardout
 
-        
-	// pair the positive set with the negative one using the motif file line and convolution filter number as key
+        // reformatting the channel to have the ids associated each with one file, instead with a list of files produced by the process
+        reformatted_positive = CONVOLUTION_SCAN.out.positve_set.transpose()
+        reformatted_negative = CONVOLUTION_SCAN.out.negative_set.transpose()
+
+	// pair the positive set with the negative one using the motif file line, fasta filename and convolution filter number as key
         // also retrieving the filter length and the motif file line from the output file name
-        posive_set           = CONVOLUTION_SCAN.out.positve_set.flatten().map{ 
+        posive_set           = reformatted_positive.map{ 
                                              it 
-                                                   -> [ "${it.baseName}".split("__")[0], \
-                                                      "${it.baseName}".split('_')[-2], \
-                                                      "${it.baseName}".split('_')[-1], \
-                                                      it ] }
-        negative_set         = CONVOLUTION_SCAN.out.negative_set.flatten().map{ 
+                                                   -> [ it[0], \
+                                                      it[1], \
+                                                      "${it[2]}".split("\\.")[-2].split('_')[-2], \
+                                                      "${it[2]}".split("\\.")[-2].split('_')[-1], \
+                                                      it[2] ] }
+        negative_set         = reformatted_negative.map{ 
                                              it
-                                                   -> [ "${it.baseName}".split("__")[0],
-                                                      "${it.baseName}".split('_')[-2], \
-                                                      "${it.baseName}".split('_')[-1], \
-                                                      it ] }
-	paired_sets          = posive_set.combine( negative_set, by:[0, 1, 2] )
+                                                   -> [ it[0], \
+                                                      it[1], \
+                                                      "${it[2]}".split("\\.")[-2].split('_')[-2], \
+                                                      "${it[2]}".split("\\.")[-2].split('_')[-1], \
+                                                      it[2] ] }
+	paired_sets          = posive_set.combine( negative_set, by:[0, 1, 2, 3] )
         
         
         // Handle the case when there is no jaspar db in input

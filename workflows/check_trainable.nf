@@ -26,7 +26,8 @@ workflow CHECK_TRAINABLE {
     if ( params.skip_check ) {
 	message = '\n# skipped check of trainability of the model\n'
     } else {
-        message = ONE_STEP_TRAIN( input_fasta )
+        in_fasta = input_fasta.map{ it -> [ (it[0] + '_' + it[1]), it[2] ]}
+        message  = ONE_STEP_TRAIN( in_fasta )
     }
 
     
