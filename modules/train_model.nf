@@ -12,22 +12,30 @@ process TRAIN_MODEL {
     tag "${dir_ID}"
 
     input:
-    tuple val(dir_ID), path(fasta)
+    tuple val(motif_line_ID), val(fasta_ID), path(fasta)
     val passed_check                         // used just to enforce dependency from the check train step
 
     output:
-    tuple val(dir_ID), path("*.pt"), emit: best_model
-    tuple val(dir_ID), path("train_statistics.txt"), emit: statistics
-    tuple val(dir_ID), path("architecture.txt"), emit: architecture
+    tuple val(motif_line_ID), val(fasta_ID), path("*.pt"), emit: best_model
+    tuple val(motif_line_ID), val(fasta_ID), path("train_statistics.txt"), emit: statistics
+    tuple val(motif_line_ID), val(fasta_ID), path("architecture.txt"), emit: architecture
     stdout emit: standardout
 
     script:
     def args = task.ext.args ?: ''
+    dir_ID   = motif_line_ID 
+    if ( fasta_ID != '') {
+        dir_ID = motif_line_ID + "_" + fasta_ID
+    }
     """
     launch_training.py -i ${fasta} ${args} 1>train_statistics.txt
     """
 
     stub:
+    dir_ID   = motif_line_ID
+    if ( fasta_ID != '') {
+        dir_ID = motif_line_ID + "_" + fasta_ID
+    }
     """
     launch_training.py -i ${fasta} -e 2 --modules_version True 1>train_statistics.txt
     head -n 4 train_statistics.txt 

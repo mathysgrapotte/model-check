@@ -63,8 +63,9 @@ workflow HANDLE_FASTA {
                 
                 // to make the next process execute the correct number of times base_fasta has to be adde to the tuple created above
                 tmp_input_files = jaspar_id_file.combine( base_fasta )
-                // and the filename of the base fasta added to the ID value
-                input_files     = tmp_input_files.map{ it -> [ it[0], it[1], it[3] ]} // TODO I am going to remove the unique ID system because it prevents HOMER from running, has to fix. 
+
+                // and the filename of the base fasta added as auxiliary ID for later on usage
+                input_files     = tmp_input_files.map{ it -> [ it[0], it[2], it[1], it[3] ]}
 
                 GENERATE_FROM_FASTA( input_files, '-j' )
                 fasta = GENERATE_FROM_FASTA.out.dna_dir
@@ -94,7 +95,7 @@ workflow HANDLE_FASTA {
 	if ( params.generate_from_fasta ) {
 
                 tmp_input_files = motif_file.combine( base_fasta )
-                input_files     = tmp_input_files.map{ it -> [ (it[0] + '_' + it[2]), it[1], it[3] ]}
+                input_files     = tmp_input_files.map{ it -> [ it[0], it[2], it[1], it[3] ]}
 
 		GENERATE_FROM_FASTA( input_files, '-m' )
                 fasta = GENERATE_FROM_FASTA.out.dna_dir

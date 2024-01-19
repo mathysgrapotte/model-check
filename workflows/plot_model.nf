@@ -23,7 +23,7 @@ workflow PLOT_MODEL{
     main:
  
     // match each architecture with it's own trained model
-    all_parameters = architecture.combine(trained_model, by:0)
+    all_parameters = architecture.combine(trained_model, by:[0,1])
 
     PLOT_MODEL_WEIGHTS( all_parameters )
     plots   = PLOT_MODEL_WEIGHTS.out.weights_plots
