@@ -63,6 +63,7 @@ workflow HANDLE_FASTA {
                 
                 // to make the next process execute the correct number of times base_fasta has to be adde to the tuple created above
                 tmp_input_files = jaspar_id_file.combine( base_fasta )
+
                 // and the filename of the base fasta added as auxiliary ID for later on usage
                 input_files     = tmp_input_files.map{ it -> [ it[0], it[2], it[1], it[3] ]}
 

@@ -27,7 +27,18 @@ def get_args():
 	return args
 
 
-def main(data, Batch_size, Shuffle, seq_len, modules_version='False'):
+def main(data, Batch_size, Shuffle, seq_len, modules_version='False', with_seed=True):
+
+	if with_seed:
+		# set the seed for reproducibility
+		seed = 42
+		torch.manual_seed(seed)
+		torch.cuda.manual_seed(seed)
+		torch.cuda.manual_seed_all(seed)
+		torch.backends.cudnn.deterministic = True
+		torch.backends.cudnn.benchmark = False
+		numpy.random.seed(seed)
+		numpy.random.RandomState(seed)
 	
 	if eval(modules_version):
                 print('python :', sys.version, '\n',  'numpy :', numpy.__version__ , '\n', 'torch :', torch.__version__, '\n', 'ray :', ray.__version__)
@@ -72,7 +83,7 @@ def main(data, Batch_size, Shuffle, seq_len, modules_version='False'):
 	
 
 	# run a testing run from the tune_trainer
-	print(tune_trainer.test_regression(model=model))
+	print(tune_trainer.test_regression(model=model, data_loader=train_set))
 
 
 if __name__ == "__main__":
