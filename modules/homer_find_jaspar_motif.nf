@@ -19,7 +19,7 @@ process HOMER_FIND_JASPAR_MOTIF {
     tuple val(motif_line_ID), val(fasta_ID), val(filter_num), val(filter_len), path(positve_set), path(negative_set), path(jaspar_db)
 
     output:
-    path( "homerResults" ), type: 'dir', emit: positve_set
+    path( "homerResults.html" ), emit: positve_set
     stdout emit: standardout
 
     script:

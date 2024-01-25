@@ -247,8 +247,14 @@ class GenerateSingleJasparMotifDataset(GenerateFasta):
                 motif = self.generate_motif_from_pwm(self.jaspar_motif)
                 # assess the match between the generated motif and the pwm
                 motif_score = self.assess_match_between_motif_and_pwm(motif, self.jaspar_motif)
+
+                # wiggle motif 
+                wiggle_range = [-3,-2, -1, 0, 1, 2, 3]
+                wiggle = random.choice(wiggle_range)
+                motif_wiggle_start = int(motif_start) + wiggle
+
                 # insert the motif in the sequence
-                self.sequences[i] = self.insert_motif_in_sequence(self.sequences[i], motif, motif_start)
+                self.sequences[i] = self.insert_motif_in_sequence(self.sequences[i], motif, motif_wiggle_start)
                 # add the motif/pwm match score to the tags
                 self.tags.append(motif_score)
             else:
