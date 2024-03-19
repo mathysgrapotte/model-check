@@ -249,7 +249,7 @@ class GenerateSingleJasparMotifDataset(GenerateFasta):
                 motif_score = self.assess_match_between_motif_and_pwm(motif, self.jaspar_motif)
 
                 # wiggle motif 
-                wiggle_range = [-3,-2, -1, 0, 1, 2, 3]
+                wiggle_range = [ -1, 0, 1]
                 wiggle = random.choice(wiggle_range)
                 motif_wiggle_start = int(motif_start) + wiggle
 
