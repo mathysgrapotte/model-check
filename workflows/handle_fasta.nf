@@ -37,7 +37,7 @@ workflow HANDLE_FASTA {
 
 
     if ( params.input_fasta ) {
-        fasta = Channel.fromPath( params.input_fasta ).map{ it -> [ it.baseName, it ] }
+        fasta = Channel.fromPath( params.input_fasta ).map{ it -> [ '', it.baseName, it ] }
         completition_message = "\n# fasta file used for the training   : ${params.input_fasta}\n"
 
 
