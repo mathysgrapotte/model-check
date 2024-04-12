@@ -106,6 +106,73 @@ class MnnHomerForegroundBackgroundSetup(HomerForegroundBackgroundSetup):
                     self.negative_hit_fasta.sequences.append(sequence)
                     self.negative_hit_fasta.sequence_names.append(name_sequence)
 
+    def scan_sequences_with_percentile(self, module_id='last', p=10):
+        """
+        For the selected module (last if it's the last module, otherwise should be an int).
+        Then, at each position, if the output is within the top p% values, extract the sequences from the input fasta corresponding to the range [starting position, starting position + filter size]
+        Store that sequence in the foreground fasta, with a label corresponding to the sequence name.
+        Do the same for the bottom p% values and store them in the background fasta.
+
+        @param module_id: the ID of the module to scan (default is 'last')
+        @param p: the percentile value (default is 10)
+
+        @return: None
+        """
+
+        # setting device
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+        # setting model to eval mode
+        self.model.eval()
+
+        # get the filter size for the given module
+        self.filter_size = self.model.get_filter_size_for_module(module_id)
+
+        # compute the output for all batches
+        outputs = []
+        for batch_idx, (data, target, name) in enumerate(self.input_fasta_data_loader):
+            # check that the sequence in the data loader and the input fasta have the same name
+            assert name[0] == self.input_fasta.sequence_names[batch_idx], f"the sequence names in the data loader and the input fasta are not the same: {name[0]} != {self.input_fasta.sequence_names[batch_idx]}"
+
+            # send data to device
+            data, target = data.to(device), target.to(device)
+
+            # convert data and target to float
+            data = data.float()
+
+            # forward
+            output = self.model.get_convolution_output_per_block(data, module_id)
+
+            # squeeze and detach output
+            output = output.squeeze().detach().cpu().numpy()
+
+            # append output to the list
+            outputs.append(output)
+
+        # concatenate outputs from all batches
+        output = np.concatenate(outputs)
+
+        # calculate the threshold values for the top p% and bottom p%
+        top_threshold = np.percentile(output, 100 - p)
+        bottom_threshold = np.percentile(output, p)
+
+        # for each position in the output
+        for i in range(len(output)):
+            # get the sequence from the input fasta
+            sequence = self.input_fasta.sequences[0][i:i+self.filter_size]
+            name_sequence = name[0] + "_" + str(i) + "_" + str(i+self.filter_size)
+
+            # if the output is within the top p% values
+            if output[i] >= top_threshold:
+                # add the sequence to the foreground fasta
+                self.positive_hit_fasta.sequences.append(sequence)
+                self.positive_hit_fasta.sequence_names.append(name_sequence)
+            # if the output is within the bottom p% values
+            elif output[i] <= bottom_threshold:
+                # add the sequence to the background fasta
+                self.negative_hit_fasta.sequences.append(sequence)
+                self.negative_hit_fasta.sequence_names.append(name_sequence)
+
     def scan_for_all_modules_and_save(self, path_to_folder):
         """
         For each module, scan the sequences and save the positive and negative hits to the given folder

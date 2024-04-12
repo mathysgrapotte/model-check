@@ -28,7 +28,8 @@ process HOMER_FIND_JASPAR_MOTIF {
         dir_ID = motif_line_ID + "_" + fasta_ID
     }
     """
-    findMotifs.pl ${positve_set} fasta . -fasta ${negative_set} -len ${filter_len} -norevopp -mcheck ${jaspar_db} -mknown ${jaspar_db}
+    findMotifs.pl ${positve_set} fasta . -fasta ${negative_set} -len ${filter_len} -norevopp 
+    # -mcheck ${jaspar_db} -mknown ${jaspar_db} was removed to allow for checking against the whole database
     """
 
     stub:
